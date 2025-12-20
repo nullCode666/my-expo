@@ -1,24 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { defaultConfig } from '@tamagui/config/v4';
+import { createTamagui, TamaguiProvider } from '@tamagui/core';
 import { Stack } from 'expo-router';
+
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+// you usually export this from a tamagui.config.ts file
+const config = createTamagui(defaultConfig)
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+type Conf = typeof config
 
+// make imports typed
+declare module '@tamagui/core' {
+  interface TamaguiCustomConfig extends Conf { }
+}
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <TamaguiProvider config={config}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
+        <Stack.Screen name="moduleB/index" options={{ headerShown: false }} />
+        <Stack.Screen name="moduleC/index" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </TamaguiProvider>
   );
 }
