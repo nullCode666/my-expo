@@ -19,10 +19,11 @@ export default function RootLayout() {
   return (
     <TamaguiProvider config={config}>
       <Stack>
+                <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
+
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
         <Stack.Screen name="moduleB/index" options={{ headerShown: false }} />
         <Stack.Screen name="moduleC/index" options={{ headerShown: false }} />
       </Stack>
