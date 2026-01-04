@@ -26,19 +26,13 @@ export default function ModuleAHome() {
   const handleSetMockLocation = () => {
     try {
       const location = {
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude)
-      };
+        latitude: 222.44,
+        longitude: 123.23
+      }
 
-      const options = {
-        altitude: altitude ? parseFloat(altitude) : undefined,
-        speed: speed ? parseFloat(speed) : undefined,
-        bearing: bearing ? parseFloat(bearing) : undefined,
-        accuracy: accuracy ? parseFloat(accuracy) : undefined,
-        delay: 100
-      };
-
-      setMockLocation({ location, options });
+      setMockLocation({
+        location: location
+      });
       setIsMocking(true);
       Alert.alert('成功', '模拟位置已设置');
     } catch (error) {
@@ -72,7 +66,7 @@ export default function ModuleAHome() {
         <ThemedText type="title" style={styles.title}>
           欢迎使用模块A
         </ThemedText>
-        
+
         <ThemedText style={styles.description}>
           这是模块A的首页，专为类型A用户设计。
         </ThemedText>
@@ -98,7 +92,7 @@ export default function ModuleAHome() {
           <ThemedText type="subtitle" style={styles.mockLocationTitle}>
             📍 Android模拟位置设置
           </ThemedText>
-          
+
           <View style={styles.inputContainer}>
             <ThemedText style={styles.inputLabel}>纬度 (Latitude):</ThemedText>
             <TextInput
