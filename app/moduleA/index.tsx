@@ -4,7 +4,14 @@ import { ThemedView } from "@/components/themed-view";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  Alert,
+  Button,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   getError,
   setMockLocation,
@@ -27,21 +34,63 @@ export default function ModuleAHome() {
     router.replace("/");
   };
 
-  const handleSetMockLocation = () => {
+  const handleSetMockLocation = async () => {
     try {
+      const lat = parseFloat(latitude);
+      const lng = parseFloat(longitude);
+
+      // 验证经纬度输入
+      if (isNaN(lat) || lat < -90 || lat > 90) {
+        Alert.alert("错误", "纬度范围应为 -90 到 90");
+        return;
+      }
+
+      if (isNaN(lng) || lng < -180 || lng > 180) {
+        Alert.alert("错误", "经度范围应为 -180 到 180");
+        return;
+      }
+
       const location = {
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude: lat,
+        longitude: lng,
       };
 
+      // 收集可选参数
+      const options: any = {};
+      if (altitude) options.altitude = parseFloat(altitude);
+      if (speed) options.speed = parseFloat(speed);
+      if (bearing) options.bearing = parseFloat(bearing);
+      if (accuracy) options.accuracy = parseFloat(accuracy);
+
       setMockLocation({
-        location: location,
+        location,
+        options,
       });
       setIsMocking(true);
-      Alert.alert("成功", "模拟位置已设置");
+      Alert.alert("成功", "模拟位置已设置", [
+        {
+          text: "确定",
+          onPress: () => {},
+        },
+      ]);
     } catch (error) {
       const errorMessage = getError();
-      Alert.alert("错误", errorMessage || "设置模拟位置失败");
+      const errorMsg = errorMessage || "设置模拟位置失败";
+
+      console.log(errorMsg);
+
+      Alert.alert(
+        "权限错误",
+        "请在Android设置中启用模拟位置功能：\n\n" +
+          "1. 打开设置 → 开发者选项\n" +
+          "2. 找到'选择模拟位置应用'\n" +
+          "3. 选择本应用\n\n" +
+          "如未看到开发者选项，请在'关于手机'中连续点击'版本号'7次。",
+        [
+          { text: "取消", style: "cancel" },
+          { text: "重试", onPress: handleSetMockLocation },
+        ],
+      );
     }
   };
 
@@ -52,7 +101,10 @@ export default function ModuleAHome() {
       Alert.alert("成功", "模拟位置已停止");
     } catch (error) {
       const errorMessage = getError();
-      Alert.alert("错误", errorMessage || "停止模拟位置失败");
+      Alert.alert(
+        "停止失败",
+        (errorMessage || "停止模拟位置失败") + "\n\n请重试或重启应用。",
+      );
     }
   };
 
@@ -97,6 +149,27 @@ export default function ModuleAHome() {
           <ThemedText type="subtitle" style={styles.mockLocationTitle}>
             📍 Android模拟位置设置
           </ThemedText>
+
+          <View style={styles.helpContainer}>
+            <TouchableOpacity
+              style={styles.helpButton}
+              onPress={() =>
+                Alert.alert(
+                  "如何启用模拟位置权限？",
+                  "1. 打开手机设置\n" +
+                    "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
+                    "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
+                    "4. 选择本应用\n\n" +
+                    "设置完成后，返回应用即可开始使用位置模拟功能。",
+                  [{ text: "我知道了", style: "default" }],
+                )
+              }
+            >
+              <ThemedText style={styles.helpButtonText}>
+                📍 需要帮助？点击这里
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.inputContainer}>
             <ThemedText style={styles.inputLabel}>纬度 (Latitude):</ThemedText>
@@ -239,6 +312,21 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     gap: 4,
+  },
+  helpContainer: {
+    marginBottom: 16,
+  },
+  helpButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  helpButtonText: {
+    color: "#4CAF50",
+    fontSize: 14,
+    fontWeight: "500",
   },
   inputLabel: {
     fontSize: 14,
