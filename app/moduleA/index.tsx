@@ -1,43 +1,47 @@
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useUserStore } from '@/src/store/userStore';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, Button, StyleSheet, TextInput, View } from 'react-native';
-import { getError, setMockLocation, stopMockLocation } from 'react-native-android-mock-location';
+import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useUserStore } from "@/src/store/userStore";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  getError,
+  setMockLocation,
+  stopMockLocation,
+} from "react-native-android-mock-location";
 
 export default function ModuleAHome() {
   const router = useRouter();
   const { reset } = useUserStore();
-  const [latitude, setLatitude] = useState('37.7749');
-  const [longitude, setLongitude] = useState('-122.4194');
-  const [altitude, setAltitude] = useState('');
-  const [speed, setSpeed] = useState('');
-  const [bearing, setBearing] = useState('');
-  const [accuracy, setAccuracy] = useState('');
+  const [latitude, setLatitude] = useState("39.96");
+  const [longitude, setLongitude] = useState("116.30");
+  const [altitude, setAltitude] = useState("");
+  const [speed, setSpeed] = useState("");
+  const [bearing, setBearing] = useState("");
+  const [accuracy, setAccuracy] = useState("");
   const [isMocking, setIsMocking] = useState(false);
 
   const handleLogout = () => {
     reset();
-    router.replace('/');
+    router.replace("/");
   };
 
   const handleSetMockLocation = () => {
     try {
       const location = {
-        latitude: 222.44,
-        longitude: 123.23
-      }
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+      };
 
       setMockLocation({
-        location: location
+        location: location,
       });
       setIsMocking(true);
-      Alert.alert('成功', '模拟位置已设置');
+      Alert.alert("成功", "模拟位置已设置");
     } catch (error) {
       const errorMessage = getError();
-      Alert.alert('错误', errorMessage || '设置模拟位置失败');
+      Alert.alert("错误", errorMessage || "设置模拟位置失败");
     }
   };
 
@@ -45,23 +49,24 @@ export default function ModuleAHome() {
     try {
       stopMockLocation();
       setIsMocking(false);
-      Alert.alert('成功', '模拟位置已停止');
+      Alert.alert("成功", "模拟位置已停止");
     } catch (error) {
       const errorMessage = getError();
-      Alert.alert('错误', errorMessage || '停止模拟位置失败');
+      Alert.alert("错误", errorMessage || "停止模拟位置失败");
     }
   };
 
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#FF6B6B', dark: '#C0392B' }}
+      headerBackgroundColor={{ light: "#FF6B6B", dark: "#C0392B" }}
       headerImage={
         <View style={styles.headerContent}>
           <ThemedText type="title" style={styles.headerTitle}>
             📱 模块A
           </ThemedText>
         </View>
-      }>
+      }
+    >
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.title}>
           欢迎使用模块A
@@ -116,7 +121,9 @@ export default function ModuleAHome() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>海拔 (Altitude) - 可选:</ThemedText>
+            <ThemedText style={styles.inputLabel}>
+              海拔 (Altitude) - 可选:
+            </ThemedText>
             <TextInput
               style={styles.input}
               value={altitude}
@@ -127,7 +134,9 @@ export default function ModuleAHome() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>速度 (Speed) - 可选:</ThemedText>
+            <ThemedText style={styles.inputLabel}>
+              速度 (Speed) - 可选:
+            </ThemedText>
             <TextInput
               style={styles.input}
               value={speed}
@@ -138,7 +147,9 @@ export default function ModuleAHome() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>方向 (Bearing) - 可选:</ThemedText>
+            <ThemedText style={styles.inputLabel}>
+              方向 (Bearing) - 可选:
+            </ThemedText>
             <TextInput
               style={styles.input}
               value={bearing}
@@ -149,7 +160,9 @@ export default function ModuleAHome() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>精度 (Accuracy) - 可选:</ThemedText>
+            <ThemedText style={styles.inputLabel}>
+              精度 (Accuracy) - 可选:
+            </ThemedText>
             <TextInput
               style={styles.input}
               value={accuracy}
@@ -162,15 +175,15 @@ export default function ModuleAHome() {
           <View style={styles.buttonContainer}>
             <Button
               title={isMocking ? "停止模拟位置" : "设置模拟位置"}
-              onPress={isMocking ? handleStopMockLocation : handleSetMockLocation}
+              onPress={
+                isMocking ? handleStopMockLocation : handleSetMockLocation
+              }
               color={isMocking ? "#FF6B6B" : "#4CAF50"}
             />
           </View>
 
           {isMocking && (
-            <ThemedText style={styles.statusText}>
-              ✅ 模拟位置已激活
-            </ThemedText>
+            <ThemedText style={styles.statusText}>✅ 模拟位置已激活</ThemedText>
           )}
         </ThemedView>
 
@@ -185,13 +198,13 @@ export default function ModuleAHome() {
 const styles = StyleSheet.create({
   headerContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   headerTitle: {
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   container: {
     padding: 20,
@@ -210,18 +223,18 @@ const styles = StyleSheet.create({
   featureCard: {
     padding: 16,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    backgroundColor: "rgba(255, 107, 107, 0.1)",
     gap: 8,
   },
   mockLocationContainer: {
     padding: 16,
     borderRadius: 8,
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
     gap: 12,
     marginBottom: 32,
   },
   mockLocationTitle: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   inputContainer: {
@@ -229,24 +242,24 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 6,
     padding: 10,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   buttonContainer: {
     marginTop: 16,
   },
   statusText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontWeight: "bold",
+    color: "#4CAF50",
   },
   logoutContainer: {
     marginTop: 20,
