@@ -18,6 +18,12 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'line.3.horizontal': 'menu',
+  'xmark': 'close',
+  'location.fill': 'location-on',
+  'briefcase.fill': 'work',
+  'target': 'track-changes',
+  'key.fill': 'vpn-key',
 } as IconMapping;
 
 /**
