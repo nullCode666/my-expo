@@ -7,6 +7,8 @@ import React, { useState } from "react";
 import {
   Alert,
   Button,
+  Linking,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -23,10 +25,10 @@ export default function ModuleAHome() {
   const { reset } = useUserStore();
   const [latitude, setLatitude] = useState("39.96");
   const [longitude, setLongitude] = useState("116.30");
-  const [altitude, setAltitude] = useState("");
-  const [speed, setSpeed] = useState("");
+  const [altitude, setAltitude] = useState("3");
+  const [speed, setSpeed] = useState("0.01");
   const [bearing, setBearing] = useState("");
-  const [accuracy, setAccuracy] = useState("");
+  const [accuracy, setAccuracy] = useState("1");
   const [isMocking, setIsMocking] = useState(false);
 
   const handleLogout = () => {
@@ -61,7 +63,7 @@ export default function ModuleAHome() {
       if (speed) options.speed = parseFloat(speed);
       if (bearing) options.bearing = parseFloat(bearing);
       if (accuracy) options.accuracy = parseFloat(accuracy);
-
+      options.delay = 0;
       setMockLocation({
         location,
         options,
@@ -74,23 +76,19 @@ export default function ModuleAHome() {
         },
       ]);
     } catch (error) {
+      console.log(error);
       const errorMessage = getError();
       const errorMsg = errorMessage || "设置模拟位置失败";
 
-      console.log(errorMsg);
-
-      Alert.alert(
-        "权限错误",
-        "请在Android设置中启用模拟位置功能：\n\n" +
-          "1. 打开设置 → 开发者选项\n" +
-          "2. 找到'选择模拟位置应用'\n" +
-          "3. 选择本应用\n\n" +
-          "如未看到开发者选项，请在'关于手机'中连续点击'版本号'7次。",
-        [
-          { text: "取消", style: "cancel" },
-          { text: "重试", onPress: handleSetMockLocation },
-        ],
-      );
+      Alert.alert("权限错误", "需要启用模拟位置权限才能使用此功能", [
+        { text: "取消", style: "cancel" },
+        {
+          text: "打开设置",
+          style: "default",
+          onPress: openDeveloperSettings,
+        },
+        { text: "重试", onPress: handleSetMockLocation },
+      ]);
     }
   };
 
@@ -105,6 +103,28 @@ export default function ModuleAHome() {
         "停止失败",
         (errorMessage || "停止模拟位置失败") + "\n\n请重试或重启应用。",
       );
+    }
+  };
+
+  const openDeveloperSettings = async () => {
+    if (Platform.OS === "android") {
+      try {
+        // 尝试打开开发者选项
+        await Linking.sendIntent(
+          "android.settings.APPLICATION_DEVELOPMENT_SETTINGS",
+        );
+      } catch (error) {
+        try {
+          // 如果开发者选项打不开，尝试打开应用详情设置
+          await Linking.sendIntent(
+            "android.settings.APPLICATION_DETAILS_SETTINGS",
+            [{ key: "package", value: "com.startwinter.myexpo" }],
+          );
+        } catch (fallbackError) {
+          // 最后尝试通用设置
+          await Linking.openSettings();
+        }
+      }
     }
   };
 
@@ -156,17 +176,36 @@ export default function ModuleAHome() {
               onPress={() =>
                 Alert.alert(
                   "如何启用模拟位置权限？",
-                  "1. 打开手机设置\n" +
-                    "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
-                    "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
-                    "4. 选择本应用\n\n" +
-                    "设置完成后，返回应用即可开始使用位置模拟功能。",
-                  [{ text: "我知道了", style: "default" }],
+                  "需要配置Android模拟位置权限。您可以：\n\n" +
+                    "📍 快速跳转：直接打开开发者设置\n" +
+                    "❓ 手动操作：按步骤手动配置\n\n" +
+                    "选择适合您的方式：",
+                  [
+                    { text: "取消", style: "cancel" },
+                    {
+                      text: "📍 快速跳转",
+                      style: "default",
+                      onPress: openDeveloperSettings,
+                    },
+                    {
+                      text: "❓ 手动指导",
+                      style: "default",
+                      onPress: () =>
+                        Alert.alert(
+                          "手动配置步骤：",
+                          "1. 打开手机设置\n" +
+                            "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
+                            "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
+                            "4. 选择本应用\n\n" +
+                            "设置完成后，返回应用即可开始使用位置模拟功能。",
+                        ),
+                    },
+                  ],
                 )
               }
             >
               <ThemedText style={styles.helpButtonText}>
-                📍 需要帮助？点击这里
+                📍 启用模拟位置权限
               </ThemedText>
             </TouchableOpacity>
           </View>
