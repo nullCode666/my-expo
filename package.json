@@ -14,7 +14,8 @@
     "build:all": "eas build --platform all",
     "build:preview": "eas build --profile preview",
     "build:production": "eas build --profile production",
-    "build:local": "eas build --local"
+    "build:local": "eas build --local",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
