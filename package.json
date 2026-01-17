@@ -7,8 +7,8 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "build:android": "eas build -p android",
-    "build:ios": "expo build:ios",
+    "build:android": "eas build -p android --local",
+    "build:ios": "expo build:ios --local",
     "web": "expo start --web",
     "lint": "expo lint",
     "build:all": "eas build --platform all",
@@ -51,14 +51,17 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.6",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/babel__core": "^7",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "patch-package": "^8.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.2"
   },
   "private": true,
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.12.0"
 }
