@@ -41,11 +41,11 @@ export default function ModuleAHome() {
 
     try {
       // 对于Android 10及以上版本，需要后台位置权限
-      const permissionsToRequest = [
-        'android.permission.ACCESS_FINE_LOCATION',
-        'android.permission.ACCESS_COARSE_LOCATION',
-        'android.permission.ACCESS_MOCK_LOCATION'
-      ];
+      // const permissionsToRequest = [
+      //   'android.permission.ACCESS_FINE_LOCATION',
+      //   'android.permission.ACCESS_COARSE_LOCATION',
+      //   'android.permission.ACCESS_MOCK_LOCATION'
+      // ];
 
       // 注意：MOCK_LOCATION权限通常需要在开发者选项中手动启用
       // 这里我们主要是检查基本的定位权限
@@ -131,7 +131,7 @@ export default function ModuleAHome() {
     } catch (error) {
       console.log(error);
       const errorMessage = getError();
-      const errorMsg = errorMessage || "设置模拟位置失败";
+      // const errorMsg = errorMessage || "设置模拟位置失败";
 
       Alert.alert("权限错误", "需要启用模拟位置权限才能使用此功能", [
         { text: "取消", style: "cancel" },
@@ -150,7 +150,7 @@ export default function ModuleAHome() {
       stopMockLocation();
       setIsMocking(false);
       Alert.alert("成功", "模拟位置已停止");
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = getError();
       Alert.alert(
         "停止失败",
@@ -166,18 +166,18 @@ export default function ModuleAHome() {
         await Linking.sendIntent(
           "android.settings.APPLICATION_DEVELOPMENT_SETTINGS",
         );
-      } catch (error) {
-        try {
-          // 如果开发者选项打不开，尝试打开应用详情设置
-          await Linking.sendIntent(
-            "android.settings.APPLICATION_DETAILS_SETTINGS",
-            [{ key: "package", value: "com.startwinter.myexpo" }],
-          );
-        } catch (fallbackError) {
-          // 最后尝试通用设置
-          await Linking.openSettings();
-        }
+      } catch (_error) {
+      try {
+        // 如果开发者选项打不开，尝试打开应用详情设置
+        await Linking.sendIntent(
+          "android.settings.APPLICATION_DETAILS_SETTINGS",
+          [{ key: "package", value: "com.startwinter.myexpo" }],
+        );
+      } catch (_fallbackError) {
+        // 最后尝试通用设置
+        await Linking.openSettings();
       }
+    }
     }
   };
 
