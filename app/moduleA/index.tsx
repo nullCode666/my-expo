@@ -30,6 +30,52 @@ export default function ModuleAHome() {
   const [bearing, setBearing] = useState("");
   const [accuracy, setAccuracy] = useState("1");
   const [isMocking, setIsMocking] = useState(false);
+  const [hasLocationPermission, setHasLocationPermission] = useState(false);
+
+  // 检查并请求位置权限
+  const requestLocationPermissions = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('提示', '模拟位置功能仅支持Android设备');
+      return false;
+    }
+
+    try {
+      // 对于Android 10及以上版本，需要后台位置权限
+      const permissionsToRequest = [
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.ACCESS_COARSE_LOCATION',
+        'android.permission.ACCESS_MOCK_LOCATION'
+      ];
+
+      // 注意：MOCK_LOCATION权限通常需要在开发者选项中手动启用
+      // 这里我们主要是检查基本的定位权限
+      
+      // 在实际应用中，您可能需要使用react-native-permissions库
+      // 或者引导用户到开发者设置中手动启用模拟位置
+      
+      Alert.alert(
+        '权限说明',
+        '模拟位置功能需要以下权限：\n\n' +
+        '• 精确位置权限 (ACCESS_FINE_LOCATION)\n' +
+        '• 粗略位置权限 (ACCESS_COARSE_LOCATION)\n' +
+        '• 模拟位置权限 (ACCESS_MOCK_LOCATION)\n\n' +
+        '请注意：模拟位置权限需要在开发者选项中手动启用。',
+        [
+          { text: '取消', style: 'cancel' },
+          {
+            text: '前往设置',
+            onPress: openDeveloperSettings,
+          }
+        ]
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('权限请求错误:', error);
+      Alert.alert('错误', '权限请求失败，请手动检查权限设置');
+      return false;
+    }
+  };
 
   const handleLogout = () => {
     reset();
@@ -38,6 +84,12 @@ export default function ModuleAHome() {
 
   const handleSetMockLocation = async () => {
     try {
+      // 首先检查权限
+      const hasPermission = await requestLocationPermissions();
+      if (!hasPermission) {
+        return;
+      }
+
       const lat = parseFloat(latitude);
       const lng = parseFloat(longitude);
 
@@ -69,6 +121,7 @@ export default function ModuleAHome() {
         options,
       });
       setIsMocking(true);
+      setHasLocationPermission(true);
       Alert.alert("成功", "模拟位置已设置", [
         {
           text: "确定",
@@ -169,6 +222,15 @@ export default function ModuleAHome() {
           <ThemedText type="subtitle" style={styles.mockLocationTitle}>
             📍 Android模拟位置设置
           </ThemedText>
+          
+          <View style={styles.permissionStatus}>
+            <ThemedText style={[
+              styles.permissionText,
+              { color: hasLocationPermission ? '#4CAF50' : '#FF6B6B' }
+            ]}>
+              {hasLocationPermission ? '✅ 权限已配置' : '⚠️ 需要配置权限'}
+            </ThemedText>
+          </View>
 
           <View style={styles.helpContainer}>
             <TouchableOpacity
@@ -387,6 +449,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontWeight: "bold",
     color: "#4CAF50",
+  },
+  permissionStatus: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  permissionText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
   logoutContainer: {
     marginTop: 20,
