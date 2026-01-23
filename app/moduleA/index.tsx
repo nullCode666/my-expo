@@ -131,17 +131,46 @@ export default function ModuleAHome() {
     } catch (error) {
       console.log(error);
       const errorMessage = getError();
-      // const errorMsg = errorMessage || "设置模拟位置失败";
+      
+      // 检查是否是MOCK_LOCATION权限错误
+      const isMockLocationError = errorMessage && (
+        errorMessage.includes('MOCK_LOCATION') || 
+        errorMessage.includes('not allowed to perform') ||
+        error.toString().includes('SecurityException')
+      );
 
-      Alert.alert("权限错误", "需要启用模拟位置权限才能使用此功能", [
-        { text: "取消", style: "cancel" },
-        {
-          text: "打开设置",
-          style: "default",
-          onPress: openDeveloperSettings,
-        },
-        { text: "重试", onPress: handleSetMockLocation },
-      ]);
+      if (isMockLocationError) {
+        Alert.alert(
+          "模拟位置权限未启用", 
+          "请在开发者选项中启用模拟位置权限：\n\n" +
+          "1. 设置 → 关于手机 → 版本号(点击7次)\n" +
+          "2. 返回 → 开发者选项\n" +
+          "3. 选择模拟位置应用 → 选择本应用\n\n" +
+          "完成后重新尝试。",
+          [
+            { text: "取消", style: "cancel" },
+            {
+              text: "打开设置",
+              style: "default",
+              onPress: openDeveloperSettings,
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          "设置失败", 
+          (errorMessage || "设置模拟位置失败") + "\n\n请检查权限或重试。",
+          [
+            { text: "取消", style: "cancel" },
+            {
+              text: "打开设置",
+              style: "default",
+              onPress: openDeveloperSettings,
+            },
+            { text: "重试", onPress: handleSetMockLocation },
+          ]
+        );
+      }
     }
   };
 
