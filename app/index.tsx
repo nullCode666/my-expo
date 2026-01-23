@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Animated,
-  Dimensions,
-  Modal,
-} from 'react-native';
-import { useRouter } from 'expo-router';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const { width } = Dimensions.get('window');
 
