@@ -3,22 +3,32 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Button,
   Linking,
   Platform,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { AMapSdk, MapView, Marker } from "react-native-amap3d";
 import {
   getError,
   setMockLocation,
   stopMockLocation,
 } from "react-native-android-mock-location";
+
+
+AMapSdk.init(
+  Platform.select({
+    android: "c52c7169e6df23490e3114330098aaac",
+    ios: "186d3464209b74effa4d8391f441f14d",
+  })
+);
 
 export default function ModuleAHome() {
   const router = useRouter();
@@ -34,8 +44,8 @@ export default function ModuleAHome() {
 
   // 检查并请求位置权限
   const requestLocationPermissions = async () => {
-    if (Platform.OS !== 'android') {
-      Alert.alert('提示', '模拟位置功能仅支持Android设备');
+    if (Platform.OS !== "android") {
+      Alert.alert("提示", "模拟位置功能仅支持Android设备");
       return false;
     }
 
@@ -49,30 +59,30 @@ export default function ModuleAHome() {
 
       // 注意：MOCK_LOCATION权限通常需要在开发者选项中手动启用
       // 这里我们主要是检查基本的定位权限
-      
+
       // 在实际应用中，您可能需要使用react-native-permissions库
       // 或者引导用户到开发者设置中手动启用模拟位置
-      
+
       Alert.alert(
-        '权限说明',
-        '模拟位置功能需要以下权限：\n\n' +
-        '• 精确位置权限 (ACCESS_FINE_LOCATION)\n' +
-        '• 粗略位置权限 (ACCESS_COARSE_LOCATION)\n' +
-        '• 模拟位置权限 (ACCESS_MOCK_LOCATION)\n\n' +
-        '请注意：模拟位置权限需要在开发者选项中手动启用。',
+        "权限说明",
+        "模拟位置功能需要以下权限：\n\n" +
+        "• 精确位置权限 (ACCESS_FINE_LOCATION)\n" +
+        "• 粗略位置权限 (ACCESS_COARSE_LOCATION)\n" +
+        "• 模拟位置权限 (ACCESS_MOCK_LOCATION)\n\n" +
+        "请注意：模拟位置权限需要在开发者选项中手动启用。",
         [
-          { text: '取消', style: 'cancel' },
+          { text: "取消", style: "cancel" },
           {
-            text: '前往设置',
+            text: "前往设置",
             onPress: openDeveloperSettings,
-          }
-        ]
+          },
+        ],
       );
-      
+
       return true;
     } catch (error) {
-      console.error('权限请求错误:', error);
-      Alert.alert('错误', '权限请求失败，请手动检查权限设置');
+      console.error("权限请求错误:", error);
+      Alert.alert("错误", "权限请求失败，请手动检查权限设置");
       return false;
     }
   };
@@ -125,23 +135,23 @@ export default function ModuleAHome() {
       Alert.alert("成功", "模拟位置已设置", [
         {
           text: "确定",
-          onPress: () => {},
+          onPress: () => { },
         },
       ]);
     } catch (error) {
       console.log(error);
       const errorMessage = getError();
-      
+
       // 检查是否是MOCK_LOCATION权限错误
-      const isMockLocationError = errorMessage && (
-        errorMessage.includes('MOCK_LOCATION') || 
-        errorMessage.includes('not allowed to perform') ||
-        error.toString().includes('SecurityException')
-      );
+      const isMockLocationError =
+        errorMessage &&
+        (errorMessage.includes("MOCK_LOCATION") ||
+          errorMessage.includes("not allowed to perform") ||
+          error.toString().includes("SecurityException"));
 
       if (isMockLocationError) {
         Alert.alert(
-          "模拟位置权限未启用", 
+          "模拟位置权限未启用",
           "请在开发者选项中启用模拟位置权限：\n\n" +
           "1. 设置 → 关于手机 → 版本号(点击7次)\n" +
           "2. 返回 → 开发者选项\n" +
@@ -154,11 +164,11 @@ export default function ModuleAHome() {
               style: "default",
               onPress: openDeveloperSettings,
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
-          "设置失败", 
+          "设置失败",
           (errorMessage || "设置模拟位置失败") + "\n\n请检查权限或重试。",
           [
             { text: "取消", style: "cancel" },
@@ -168,7 +178,7 @@ export default function ModuleAHome() {
               onPress: openDeveloperSettings,
             },
             { text: "重试", onPress: handleSetMockLocation },
-          ]
+          ],
         );
       }
     }
@@ -196,17 +206,17 @@ export default function ModuleAHome() {
           "android.settings.APPLICATION_DEVELOPMENT_SETTINGS",
         );
       } catch (_error) {
-      try {
-        // 如果开发者选项打不开，尝试打开应用详情设置
-        await Linking.sendIntent(
-          "android.settings.APPLICATION_DETAILS_SETTINGS",
-          [{ key: "package", value: "com.startwinter.myexpo" }],
-        );
-      } catch (_fallbackError) {
-        // 最后尝试通用设置
-        await Linking.openSettings();
+        try {
+          // 如果开发者选项打不开，尝试打开应用详情设置
+          await Linking.sendIntent(
+            "android.settings.APPLICATION_DETAILS_SETTINGS",
+            [{ key: "package", value: "com.startwinter.myexpo" }],
+          );
+        } catch (_fallbackError) {
+          // 最后尝试通用设置
+          await Linking.openSettings();
+        }
       }
-    }
     }
   };
 
@@ -251,13 +261,15 @@ export default function ModuleAHome() {
           <ThemedText type="subtitle" style={styles.mockLocationTitle}>
             📍 Android模拟位置设置
           </ThemedText>
-          
+
           <View style={styles.permissionStatus}>
-            <ThemedText style={[
-              styles.permissionText,
-              { color: hasLocationPermission ? '#4CAF50' : '#FF6B6B' }
-            ]}>
-              {hasLocationPermission ? '✅ 权限已配置' : '⚠️ 需要配置权限'}
+            <ThemedText
+              style={[
+                styles.permissionText,
+                { color: hasLocationPermission ? "#4CAF50" : "#FF6B6B" },
+              ]}
+            >
+              {hasLocationPermission ? "✅ 权限已配置" : "⚠️ 需要配置权限"}
             </ThemedText>
           </View>
 
@@ -268,9 +280,9 @@ export default function ModuleAHome() {
                 Alert.alert(
                   "如何启用模拟位置权限？",
                   "需要配置Android模拟位置权限。您可以：\n\n" +
-                    "📍 快速跳转：直接打开开发者设置\n" +
-                    "❓ 手动操作：按步骤手动配置\n\n" +
-                    "选择适合您的方式：",
+                  "📍 快速跳转：直接打开开发者设置\n" +
+                  "❓ 手动操作：按步骤手动配置\n\n" +
+                  "选择适合您的方式：",
                   [
                     { text: "取消", style: "cancel" },
                     {
@@ -285,10 +297,10 @@ export default function ModuleAHome() {
                         Alert.alert(
                           "手动配置步骤：",
                           "1. 打开手机设置\n" +
-                            "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
-                            "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
-                            "4. 选择本应用\n\n" +
-                            "设置完成后，返回应用即可开始使用位置模拟功能。",
+                          "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
+                          "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
+                          "4. 选择本应用\n\n" +
+                          "设置完成后，返回应用即可开始使用位置模拟功能。",
                         ),
                     },
                   ],
@@ -384,6 +396,35 @@ export default function ModuleAHome() {
               color={isMocking ? "#FF6B6B" : "#4CAF50"}
             />
           </View>
+
+          <MapView>
+            <Marker
+              position={{ latitude: 39.806901, longitude: 116.397972 }}
+              icon={require("../images/flag.png")}
+              onPress={() => alert("onPress")}
+            />
+            <Marker
+              position={{ latitude: 39.806901, longitude: 116.297972 }}
+              icon={{
+                uri: "https://reactnative.dev/img/pwa/manifest-icon-512.png",
+                width: 64,
+                height: 64,
+              }}
+            />
+            <Marker position={{ latitude: 39.906901, longitude: 116.397972 }}>
+              <Text
+                style={{
+                  color: "#fff",
+                  backgroundColor: "#009688",
+                  alignItems: "center",
+                  borderRadius: 5,
+                  padding: 5,
+                }}
+              >
+                {new Date().toLocaleString()}
+              </Text>
+            </Marker>
+          </MapView>;
 
           {isMocking && (
             <ThemedText style={styles.statusText}>✅ 模拟位置已激活</ThemedText>
