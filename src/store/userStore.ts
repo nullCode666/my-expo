@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 // 定义用户类型
-export type UserType = 'moduleA' | 'moduleB' | 'moduleC' | null;
+export type UserType = 'mockLocation' | 'lookTV' | 'moduleC' | null;
 
 // 定义密钥类型映射
 const KEY_TYPE_MAP: Record<string, UserType> = {
-  'keyA123': 'moduleA',
-  'keyB456': 'moduleB',
-  'keyC789': 'moduleC',
+  'test1': 'mockLocation',
+  'test2': 'lookTV',
+  'test3': 'moduleC',
 };
 
 // 定义 store 类型

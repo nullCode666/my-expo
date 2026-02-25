@@ -30,11 +30,11 @@ export default function LoginScreen() {
 
     if (isValid && userType) {
       switch (userType) {
-        case "moduleA":
-          router.replace("/moduleA");
+        case "mockLocation":
+          router.replace("/mockLocation");
           break;
-        case "moduleB":
-          router.replace("/moduleB");
+        case "lookTV":
+          router.replace("/lookTV");
           break;
         case "moduleC":
           router.replace("/moduleC");

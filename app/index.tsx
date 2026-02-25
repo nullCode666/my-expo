@@ -1,9 +1,9 @@
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -11,9 +11,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -22,28 +22,28 @@ export default function HomeScreen() {
 
   const menuItems = [
     {
-      title: '模块A',
-      subtitle: '位置模拟功能',
-      icon: 'location.fill',
-      color: '#FF6B6B',
+      title: "模拟定位",
+      subtitle: "位置模拟功能",
+      icon: "location.fill",
+      color: "#FF6B6B",
     },
     {
-      title: '模块B',
-      subtitle: '商务功能',
-      icon: 'briefcase.fill',
-      color: '#4ECDC4',
+      title: "看电视",
+      subtitle: "商务功能",
+      icon: "briefcase.fill",
+      color: "#4ECDC4",
     },
     {
-      title: '模块C',
-      subtitle: '目标功能',
-      icon: 'target',
-      color: '#95E1D3',
+      title: "模块C",
+      subtitle: "目标功能",
+      icon: "target",
+      color: "#95E1D3",
     },
     {
-      title: '密钥验证',
-      subtitle: '切换模块访问',
-      icon: 'key.fill',
-      color: '#667eea',
+      title: "密钥验证",
+      subtitle: "切换模块访问",
+      icon: "key.fill",
+      color: "#667eea",
     },
   ];
 
@@ -57,30 +57,43 @@ export default function HomeScreen() {
     setMenuVisible(!menuVisible);
   };
 
-   const handleMenuNavigation = (index: number) => {
-     toggleMenu();
-     setTimeout(() => {
-       switch (index) {
-         case 0:
-           router.push('/moduleA');
-           break;
-         case 1:
-           router.push('/moduleB');
-           break;
-         case 2:
-           router.push('/moduleC');
-           break;
-         case 3:
-           router.push('/login');
-           break;
-       }
-     }, 300);
-   };
+  const handleMenuNavigation = (index: number) => {
+    toggleMenu();
+    setTimeout(() => {
+      switch (index) {
+        case 0:
+          router.push("/mockLocation");
+          break;
+        case 1:
+          router.push("/lookTV");
+          break;
+        case 2:
+          router.push("/moduleC");
+          break;
+        case 3:
+          router.push("/login");
+          break;
+      }
+    }, 300);
+  };
+
+  // 判断环境
+  const isDev = __DEV__;
+
+  if (!isDev) {
+    setTimeout(() => {
+      if (isDev) {
+        router.push("/login");
+      }
+    }, 1000);
+
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       <ParallaxScrollView
-        headerBackgroundColor={{ light: '#FF6B6B', dark: '#C0392B' }}
+        headerBackgroundColor={{ light: "#FF6B6B", dark: "#C0392B" }}
         headerImage={
           <View style={styles.headerContent}>
             <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
@@ -90,7 +103,8 @@ export default function HomeScreen() {
               📱 模块A - 欢迎
             </ThemedText>
           </View>
-        }>
+        }
+      >
         <ThemedView style={styles.content}>
           <ThemedText type="title" style={styles.welcomeTitle}>
             欢迎使用模块A
@@ -119,7 +133,8 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={styles.enterButton}
-            onPress={() => router.push('/moduleA')}>
+            onPress={() => router.push("/mockLocation")}
+          >
             <ThemedText style={styles.enterButtonText}>
               进入完整功能页面
             </ThemedText>
@@ -131,7 +146,8 @@ export default function HomeScreen() {
         visible={menuVisible}
         transparent
         animationType="fade"
-        onRequestClose={toggleMenu}>
+        onRequestClose={toggleMenu}
+      >
         <View style={styles.modalOverlay}>
           <TouchableOpacity
             style={styles.overlayTouch}
@@ -142,7 +158,8 @@ export default function HomeScreen() {
             style={[
               styles.sideMenu,
               { transform: [{ translateX: slideAnim }] },
-            ]}>
+            ]}
+          >
             <ThemedView style={styles.menuHeader}>
               <ThemedText type="title" style={styles.menuTitle}>
                 选择模块
@@ -152,35 +169,32 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </ThemedView>
 
-             <View style={styles.menuItems}>
-               {menuItems.map((item, index) => (
-                 <TouchableOpacity
-                   key={index}
-                   style={[styles.menuItem, { borderLeftColor: item.color }]}
-                   onPress={() => handleMenuNavigation(index)}>
-                   <View style={styles.menuItemContent}>
-                     <IconSymbol
-                       name={item.icon as any}
-                       size={24}
-                       color={item.color}
-                     />
-                     <View style={styles.menuItemText}>
-                       <ThemedText style={styles.menuItemTitle}>
-                         {item.title}
-                       </ThemedText>
-                       <ThemedText style={styles.menuItemSubtitle}>
-                         {item.subtitle}
-                       </ThemedText>
-                     </View>
-                   </View>
-                   <IconSymbol
-                     name="chevron.right"
-                     size={16}
-                     color="#ccc"
-                   />
-                 </TouchableOpacity>
-               ))}
-             </View>
+            <View style={styles.menuItems}>
+              {menuItems.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.menuItem, { borderLeftColor: item.color }]}
+                  onPress={() => handleMenuNavigation(index)}
+                >
+                  <View style={styles.menuItemContent}>
+                    <IconSymbol
+                      name={item.icon as any}
+                      size={24}
+                      color={item.color}
+                    />
+                    <View style={styles.menuItemText}>
+                      <ThemedText style={styles.menuItemTitle}>
+                        {item.title}
+                      </ThemedText>
+                      <ThemedText style={styles.menuItemSubtitle}>
+                        {item.subtitle}
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <IconSymbol name="chevron.right" size={16} color="#ccc" />
+                </TouchableOpacity>
+              ))}
+            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -194,33 +208,33 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    position: 'relative',
+    position: "relative",
   },
   menuButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 20,
     padding: 10,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
   headerTitle: {
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   content: {
     padding: 20,
     gap: 24,
   },
   welcomeTitle: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   description: {
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
     marginBottom: 24,
     lineHeight: 20,
@@ -232,70 +246,70 @@ const styles = StyleSheet.create({
   featureCard: {
     padding: 16,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    backgroundColor: "rgba(255, 107, 107, 0.1)",
     gap: 8,
   },
   enterButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: "#FF6B6B",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   enterButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   overlayTouch: {
     flex: 1,
   },
   sideMenu: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
     width: width * 0.8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 50,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
   },
   menuHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   menuTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   menuItems: {
     paddingTop: 20,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderLeftWidth: 4,
-    borderLeftColor: 'transparent',
+    borderLeftColor: "transparent",
   },
   menuItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
     flex: 1,
   },
@@ -304,11 +318,11 @@ const styles = StyleSheet.create({
   },
   menuItemTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 2,
   },
   menuItemSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
 });

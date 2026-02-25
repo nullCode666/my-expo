@@ -16,34 +16,35 @@ declare module "@tamagui/core" {
 
 export default function RootLayout() {
   return (
-    <TamaguiProvider config={config}>
-      <Stack>
+    <TamaguiProvider config={config} defaultTheme="light">
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
         {/* ==================== 公共模块 ==================== */}
         {/* 首页 */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="index" />
 
         {/* 登录 */}
-        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="login" />
 
         {/* ==================== 业务模块 ==================== */}
         {/* 模块A - 位置模拟功能 */}
-        <Stack.Screen name="moduleA" options={{ headerShown: false }} />
+        <Stack.Screen name="mockLocation" />
 
         {/* 模块B - 商务功能 */}
-        <Stack.Screen name="moduleB" options={{ headerShown: false }} />
+        <Stack.Screen name="lookTV" />
 
         {/* 模块C - 目标功能 */}
-        <Stack.Screen name="moduleC" options={{ headerShown: false }} />
+        <Stack.Screen name="moduleC" />
 
         {/* ==================== 工具组件 ==================== */}
         {/* 地图选择器 */}
-        <Stack.Screen name="map-picker" options={{ headerShown: false }} />
+        <Stack.Screen name="map-picker" />
 
         {/* 模态框 */}
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
+        <Stack.Screen name="modal" />
       </Stack>
       <StatusBar style="auto" />
     </TamaguiProvider>

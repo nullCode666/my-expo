@@ -28,7 +28,7 @@ export default function MapPickerPage() {
   // 确认选择
   const handleConfirm = useCallback(() => {
     router.navigate({
-      pathname: "/moduleA",
+      pathname: "/mockLocation",
       params: {
         selectedLatitude: selectedLocation.latitude.toString(),
         selectedLongitude: selectedLocation.longitude.toString(),
