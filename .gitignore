@@ -48,11 +48,11 @@ app-example
 *.apk
 
 # yarn
-.yarn
+# .yarn
 
 
 
 .trae
 
 
-yarn/install-state.gz
+.yarn/
