@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useUserStore } from "@/src/store/userStore";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   View,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useUserStore } from '@/src/store/userStore';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+} from "react-native";
 
 export default function LoginScreen() {
-  const [secretKey, setSecretKey] = useState('');
+  const [secretKey, setSecretKey] = useState("");
   const router = useRouter();
   const { setSecretKey: setStoreKey, validateKey, userType } = useUserStore();
 
   const handleSubmit = () => {
     if (!secretKey.trim()) {
-      Alert.alert('错误', '请输入密钥');
+      Alert.alert("错误", "请输入密钥");
       return;
     }
 
@@ -29,38 +29,39 @@ export default function LoginScreen() {
     const isValid = validateKey();
 
     if (isValid && userType) {
-      // 根据用户类型导航到对应模块
       switch (userType) {
-        case 'moduleA':
-          router.replace('/moduleA');
+        case "moduleA":
+          router.replace("/moduleA");
           break;
-        case 'moduleB':
-          router.replace('/moduleB');
+        case "moduleB":
+          router.replace("/moduleB");
           break;
-        case 'moduleC':
-          router.replace('/moduleC');
+        case "moduleC":
+          router.replace("/moduleC");
           break;
         default:
-          Alert.alert('错误', '未知的用户类型');
+          Alert.alert("错误", "未知的用户类型");
       }
     } else {
-      Alert.alert('错误', '无效的密钥，请重试');
+      Alert.alert("错误", "无效的密钥，请重试");
     }
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#667eea', dark: '#764ba2' }}
-      headerImage={
-        <View style={styles.headerContent}>
-          <ThemedText type="title" style={styles.headerTitle}>
-            🔑 密钥验证
-          </ThemedText>
-        </View>
-      }>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.keyboardAvoidingView}
+    >
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: "#667eea", dark: "#764ba2" }}
+        headerImage={
+          <View style={styles.headerContent}>
+            <ThemedText type="title" style={styles.headerTitle}>
+              🔑 密钥验证
+            </ThemedText>
+          </View>
+        }
+      >
         <ThemedView style={styles.content}>
           <ThemedText type="title" style={styles.title}>
             请输入您的访问密钥
@@ -105,21 +106,24 @@ export default function LoginScreen() {
             </View>
           </View>
         </ThemedView>
-      </KeyboardAvoidingView>
-    </ParallaxScrollView>
+      </ParallaxScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   headerContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   headerTitle: {
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   container: {
     flex: 1,
@@ -129,11 +133,11 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   description: {
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
     marginBottom: 24,
   },
@@ -142,47 +146,47 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   buttonContainer: {
     marginTop: 16,
   },
   button: {
-    backgroundColor: '#667eea',
+    backgroundColor: "#667eea",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   demoKeysContainer: {
     marginTop: 32,
     padding: 16,
-    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+    backgroundColor: "rgba(102, 126, 234, 0.1)",
     borderRadius: 8,
     gap: 8,
   },
   demoKeysTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 8,
   },
   demoKeyItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 4,
   },
   demoKeyLabel: {
@@ -190,8 +194,8 @@ const styles = StyleSheet.create({
   },
   demoKeyValue: {
     fontSize: 14,
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,

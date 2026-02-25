@@ -127,7 +127,6 @@ export default function HomeScreen() {
         </ThemedView>
       </ParallaxScrollView>
 
-      {/* 侧滑菜单 */}
       <Modal
         visible={menuVisible}
         transparent

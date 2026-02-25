@@ -1,7 +1,7 @@
+import "@/global.css";
 import { defaultConfig } from "@tamagui/config/v4";
 import { createTamagui, TamaguiProvider } from "@tamagui/core";
 import { Stack } from "expo-router";
-import "../global.css";
 
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
@@ -19,17 +19,25 @@ export default function RootLayout() {
   return (
     <TamaguiProvider config={config}>
       <Stack>
-        <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
-
+        {/* 首页 - 模块A预览 */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* 登录页 */}
         <Stack.Screen name="login" options={{ headerShown: false }} />
+
+        {/* 三个主要模块 */}
+        <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
+        <Stack.Screen name="moduleB/index" options={{ headerShown: false }} />
+        <Stack.Screen name="moduleC/index" options={{ headerShown: false }} />
+
+        {/* 地图选择器 */}
+        <Stack.Screen name="map-picker" options={{ headerShown: false }} />
+
+        {/* 模态框 */}
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
         />
-        <Stack.Screen name="moduleB/index" options={{ headerShown: false }} />
-        <Stack.Screen name="moduleC/index" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </TamaguiProvider>

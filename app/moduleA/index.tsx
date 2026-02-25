@@ -2,32 +2,30 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useUserStore } from "@/src/store/userStore";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Button,
   Linking,
   Platform,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { AMapSdk, MapView, Marker } from "react-native-amap3d";
+import { AMapSdk } from "react-native-amap3d";
 import {
   getError,
   setMockLocation,
   stopMockLocation,
 } from "react-native-android-mock-location";
 
-
 AMapSdk.init(
   Platform.select({
     android: "c52c7169e6df23490e3114330098aaac",
     ios: "186d3464209b74effa4d8391f441f14d",
-  })
+  }),
 );
 
 export default function ModuleAHome() {
@@ -42,7 +40,6 @@ export default function ModuleAHome() {
   const [isMocking, setIsMocking] = useState(false);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
 
-  // 检查并请求位置权限
   const requestLocationPermissions = async () => {
     if (Platform.OS !== "android") {
       Alert.alert("提示", "模拟位置功能仅支持Android设备");
@@ -50,26 +47,13 @@ export default function ModuleAHome() {
     }
 
     try {
-      // 对于Android 10及以上版本，需要后台位置权限
-      // const permissionsToRequest = [
-      //   'android.permission.ACCESS_FINE_LOCATION',
-      //   'android.permission.ACCESS_COARSE_LOCATION',
-      //   'android.permission.ACCESS_MOCK_LOCATION'
-      // ];
-
-      // 注意：MOCK_LOCATION权限通常需要在开发者选项中手动启用
-      // 这里我们主要是检查基本的定位权限
-
-      // 在实际应用中，您可能需要使用react-native-permissions库
-      // 或者引导用户到开发者设置中手动启用模拟位置
-
       Alert.alert(
         "权限说明",
         "模拟位置功能需要以下权限：\n\n" +
-        "• 精确位置权限 (ACCESS_FINE_LOCATION)\n" +
-        "• 粗略位置权限 (ACCESS_COARSE_LOCATION)\n" +
-        "• 模拟位置权限 (ACCESS_MOCK_LOCATION)\n\n" +
-        "请注意：模拟位置权限需要在开发者选项中手动启用。",
+          "• 精确位置权限 (ACCESS_FINE_LOCATION)\n" +
+          "• 粗略位置权限 (ACCESS_COARSE_LOCATION)\n" +
+          "• 模拟位置权限 (ACCESS_MOCK_LOCATION)\n\n" +
+          "请注意：模拟位置权限需要在开发者选项中手动启用。",
         [
           { text: "取消", style: "cancel" },
           {
@@ -94,7 +78,6 @@ export default function ModuleAHome() {
 
   const handleSetMockLocation = async () => {
     try {
-      // 首先检查权限
       const hasPermission = await requestLocationPermissions();
       if (!hasPermission) {
         return;
@@ -103,7 +86,6 @@ export default function ModuleAHome() {
       const lat = parseFloat(latitude);
       const lng = parseFloat(longitude);
 
-      // 验证经纬度输入
       if (isNaN(lat) || lat < -90 || lat > 90) {
         Alert.alert("错误", "纬度范围应为 -90 到 90");
         return;
@@ -119,7 +101,6 @@ export default function ModuleAHome() {
         longitude: lng,
       };
 
-      // 收集可选参数
       const options: any = {};
       if (altitude) options.altitude = parseFloat(altitude);
       if (speed) options.speed = parseFloat(speed);
@@ -135,14 +116,13 @@ export default function ModuleAHome() {
       Alert.alert("成功", "模拟位置已设置", [
         {
           text: "确定",
-          onPress: () => { },
+          onPress: () => {},
         },
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       const errorMessage = getError();
 
-      // 检查是否是MOCK_LOCATION权限错误
       const isMockLocationError =
         errorMessage &&
         (errorMessage.includes("MOCK_LOCATION") ||
@@ -153,10 +133,10 @@ export default function ModuleAHome() {
         Alert.alert(
           "模拟位置权限未启用",
           "请在开发者选项中启用模拟位置权限：\n\n" +
-          "1. 设置 → 关于手机 → 版本号(点击7次)\n" +
-          "2. 返回 → 开发者选项\n" +
-          "3. 选择模拟位置应用 → 选择本应用\n\n" +
-          "完成后重新尝试。",
+            "1. 设置 → 关于手机 → 版本号(点击7次)\n" +
+            "2. 返回 → 开发者选项\n" +
+            "3. 选择模拟位置应用 → 选择本应用\n\n" +
+            "完成后重新尝试。",
           [
             { text: "取消", style: "cancel" },
             {
@@ -201,24 +181,50 @@ export default function ModuleAHome() {
   const openDeveloperSettings = async () => {
     if (Platform.OS === "android") {
       try {
-        // 尝试打开开发者选项
         await Linking.sendIntent(
           "android.settings.APPLICATION_DEVELOPMENT_SETTINGS",
         );
       } catch (_error) {
         try {
-          // 如果开发者选项打不开，尝试打开应用详情设置
           await Linking.sendIntent(
             "android.settings.APPLICATION_DETAILS_SETTINGS",
             [{ key: "package", value: "com.startwinter.myexpo" }],
           );
         } catch (_fallbackError) {
-          // 最后尝试通用设置
           await Linking.openSettings();
         }
       }
     }
   };
+
+  // 打开地图选择器
+  const openMapPicker = () => {
+    router.push({
+      pathname: "/map-picker",
+      params: {
+        initialLatitude: latitude,
+        initialLongitude: longitude,
+        title: "选择模拟位置",
+      },
+    });
+  };
+
+  // 接收地图选择器返回的结果
+  const params = useLocalSearchParams<{
+    selectedLatitude?: string;
+    selectedLongitude?: string;
+  }>();
+
+  useEffect(() => {
+    if (params.selectedLatitude && params.selectedLongitude) {
+      setLatitude(params.selectedLatitude);
+      setLongitude(params.selectedLongitude);
+      Alert.alert(
+        "位置已更新",
+        `已选择新位置:\n纬度: ${params.selectedLatitude}\n经度: ${params.selectedLongitude}`,
+      );
+    }
+  }, [params.selectedLatitude, params.selectedLongitude]);
 
   return (
     <ParallaxScrollView
@@ -231,6 +237,7 @@ export default function ModuleAHome() {
         </View>
       }
     >
+      <View style={{ width: "100%", height: 200 }}></View>
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.title}>
           欢迎使用模块A
@@ -280,9 +287,9 @@ export default function ModuleAHome() {
                 Alert.alert(
                   "如何启用模拟位置权限？",
                   "需要配置Android模拟位置权限。您可以：\n\n" +
-                  "📍 快速跳转：直接打开开发者设置\n" +
-                  "❓ 手动操作：按步骤手动配置\n\n" +
-                  "选择适合您的方式：",
+                    "📍 快速跳转：直接打开开发者设置\n" +
+                    "❓ 手动操作：按步骤手动配置\n\n" +
+                    "选择适合您的方式：",
                   [
                     { text: "取消", style: "cancel" },
                     {
@@ -297,10 +304,10 @@ export default function ModuleAHome() {
                         Alert.alert(
                           "手动配置步骤：",
                           "1. 打开手机设置\n" +
-                          "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
-                          "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
-                          "4. 选择本应用\n\n" +
-                          "设置完成后，返回应用即可开始使用位置模拟功能。",
+                            "2. 找到'开发者选项'（如未显示，请在'关于手机'中点击7次'版本号'）\n" +
+                            "3. 找到'选择模拟位置应用'或'允许模拟位置'\n" +
+                            "4. 选择本应用\n\n" +
+                            "设置完成后，返回应用即可开始使用位置模拟功能。",
                         ),
                     },
                   ],
@@ -309,6 +316,21 @@ export default function ModuleAHome() {
             >
               <ThemedText style={styles.helpButtonText}>
                 📍 启用模拟位置权限
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+
+          {/* 地图选择按钮 */}
+          <View style={styles.helpContainer}>
+            <TouchableOpacity
+              style={[
+                styles.helpButton,
+                { backgroundColor: "rgba(0, 122, 255, 0.1)" },
+              ]}
+              onPress={openMapPicker}
+            >
+              <ThemedText style={[styles.helpButtonText, { color: "#007AFF" }]}>
+                🗺️ 在地图上选择位置
               </ThemedText>
             </TouchableOpacity>
           </View>
@@ -396,35 +418,6 @@ export default function ModuleAHome() {
               color={isMocking ? "#FF6B6B" : "#4CAF50"}
             />
           </View>
-
-          <MapView>
-            <Marker
-              position={{ latitude: 39.806901, longitude: 116.397972 }}
-              icon={require("../images/flag.png")}
-              onPress={() => alert("onPress")}
-            />
-            <Marker
-              position={{ latitude: 39.806901, longitude: 116.297972 }}
-              icon={{
-                uri: "https://reactnative.dev/img/pwa/manifest-icon-512.png",
-                width: 64,
-                height: 64,
-              }}
-            />
-            <Marker position={{ latitude: 39.906901, longitude: 116.397972 }}>
-              <Text
-                style={{
-                  color: "#fff",
-                  backgroundColor: "#009688",
-                  alignItems: "center",
-                  borderRadius: 5,
-                  padding: 5,
-                }}
-              >
-                {new Date().toLocaleString()}
-              </Text>
-            </Marker>
-          </MapView>;
 
           {isMocking && (
             <ThemedText style={styles.statusText}>✅ 模拟位置已激活</ThemedText>
