@@ -6,30 +6,36 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-// you usually export this from a tamagui.config.ts file
 const config = createTamagui(defaultConfig);
 
 type Conf = typeof config;
 
-// make imports typed
 declare module "@tamagui/core" {
   interface TamaguiCustomConfig extends Conf {}
 }
+
 export default function RootLayout() {
   return (
     <TamaguiProvider config={config}>
       <Stack>
-        {/* 首页 - 模块A预览 */}
+        {/* ==================== 公共模块 ==================== */}
+        {/* 首页 */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
 
-        {/* 登录页 */}
+        {/* 登录 */}
         <Stack.Screen name="login" options={{ headerShown: false }} />
 
-        {/* 三个主要模块 */}
-        <Stack.Screen name="moduleA/index" options={{ headerShown: false }} />
-        <Stack.Screen name="moduleB/index" options={{ headerShown: false }} />
-        <Stack.Screen name="moduleC/index" options={{ headerShown: false }} />
+        {/* ==================== 业务模块 ==================== */}
+        {/* 模块A - 位置模拟功能 */}
+        <Stack.Screen name="moduleA" options={{ headerShown: false }} />
 
+        {/* 模块B - 商务功能 */}
+        <Stack.Screen name="moduleB" options={{ headerShown: false }} />
+
+        {/* 模块C - 目标功能 */}
+        <Stack.Screen name="moduleC" options={{ headerShown: false }} />
+
+        {/* ==================== 工具组件 ==================== */}
         {/* 地图选择器 */}
         <Stack.Screen name="map-picker" options={{ headerShown: false }} />
 
