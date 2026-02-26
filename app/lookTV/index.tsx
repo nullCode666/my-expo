@@ -17,7 +17,7 @@ interface TvItem {
   icon: string;
   analysisUrlList: string[];
   remark: string;
-  injectionSc: string;
+  injectedJavaScript: string;
 }
 
 export default function ModuleBHome() {
@@ -31,49 +31,56 @@ export default function ModuleBHome() {
         name: "腾讯视频",
         url: "https://v.qq.com/",
         icon: "https://imgcache.qq.com/tencentvideo_v1/cover/cover.png",
-        analysisUrlList: ["https://解析1.com"],
+        analysisUrlList: ["解析1", "解析2"],
         remark: "国内主流视频平台",
-        injectionSc: "",
+        injectedJavaScript: "",
       },
       {
         name: "爱奇艺",
         url: "https://www.iq.com/",
         icon: "https://www.iq.com/logo.png",
-        analysisUrlList: ["https://解析2.com"],
+        analysisUrlList: ["解析1", "解析2"],
         remark: "高清影视资源丰富",
-        injectionSc: "",
+        injectedJavaScript: "",
       },
       {
         name: "优酷",
         url: "https://www.youku.com/",
         icon: "https://www.youku.com/logo.png",
-        analysisUrlList: ["https://解析3.com"],
+        analysisUrlList: ["解析1", "解析2"],
         remark: "阿里旗下视频平台",
-        injectionSc: "",
+        injectedJavaScript: "",
       },
       {
         name: "B站",
         url: "https://www.bilibili.com/",
         icon: "https://www.bilibili.com/favicon.ico",
-        analysisUrlList: ["https://解析4.com"],
+        analysisUrlList: ["解析1", "解析2"],
         remark: "年轻弹幕视频网站",
-        injectionSc: "",
+        injectedJavaScript: "",
       },
       {
         name: "芒果TV",
         url: "https://www.mgtv.com/",
         icon: "https://www.mgtv.com/favicon.ico",
-        analysisUrlList: ["https://解析5.com"],
+        analysisUrlList: ["解析1", "解析2"],
         remark: "湖南卫视官方平台",
-        injectionSc: "",
+        injectedJavaScript: "",
       },
     ];
     setTvList(list);
   }, []);
 
+  // 直接打开网页
   const handleItemPress = (item: TvItem) => {
-    console.log("点击了:", item.name);
-    router.push("/modal");
+    router.push({
+      pathname: "/webview",
+      params: {
+        url: item.url,
+        name: item.name,
+        injectionSc: item.injectionSc,
+      },
+    });
   };
 
   return (
@@ -106,7 +113,7 @@ export default function ModuleBHome() {
                   {item.analysisUrlList.length} 个解析源
                 </Text>
               </YStack>
-              <Text color="gray">{" > "}</Text>
+              <Text color="gray">{">"}</Text>
             </XStack>
           </Card>
         ))}

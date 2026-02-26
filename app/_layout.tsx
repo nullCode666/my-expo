@@ -45,6 +45,9 @@ export default function RootLayout() {
 
         {/* 模态框 */}
         <Stack.Screen name="modal" />
+
+        {/* WebView */}
+        <Stack.Screen name="webview" />
       </Stack>
       <StatusBar style="auto" />
     </TamaguiProvider>
