@@ -1,3 +1,4 @@
+import { ModuleReleaseCard } from "@/src/components/module-release-card";
 import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
@@ -24,7 +25,7 @@ interface TvItem {
 
 export default function VideoHomeScreen() {
   const router = useRouter();
-  const { isValidKey, userType } = useUserStore();
+  const { downloadedBundleUri, isValidKey, release, userType } = useUserStore();
   const isDev = __DEV__;
 
   const canAccessCurrentModule = canAccessModuleRoute("/lookTV", {
@@ -103,6 +104,10 @@ export default function VideoHomeScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#f5f5f5", padding: 16 }}>
       <YStack gap={12}>
+        <ModuleReleaseCard
+          release={release}
+          downloadedBundleUri={downloadedBundleUri}
+        />
         {tvList.map((item, index) => (
           <Card
             key={index}

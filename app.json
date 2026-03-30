@@ -3,6 +3,7 @@
     "name": "my-expo",
     "slug": "my-expo",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myexpo",
@@ -34,6 +35,13 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "NEVER",
+      "fallbackToCacheTimeout": 0,
+      "disableAntiBrickingMeasures": true,
+      "url": "https://example.com/api/updates"
     },
     "plugins": [
       "expo-router",

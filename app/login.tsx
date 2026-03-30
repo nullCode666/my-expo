@@ -1,13 +1,17 @@
 import ParallaxScrollView from "@/src/components/parallax-scroll-view";
 import { ThemedText } from "@/src/components/themed-text";
 import { ThemedView } from "@/src/components/themed-view";
-import { MODULE_ACCESS_ITEMS } from "@/src/config/moduleAccess";
+import {
+  getUpgradeUrl,
+  resolveModuleByKey,
+} from "@/src/services/moduleResolver";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   StyleSheet,
   TextInput,
@@ -17,34 +21,95 @@ import {
 
 export default function LoginScreen() {
   const [secretKey, setSecretKey] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
-  const { setSecretKey: setStoreKey, validateKey } = useUserStore();
+  const { setSecretKey: setStoreKey, applyResolvedModule, setError, reset } =
+    useUserStore();
 
-  const handleSubmit = () => {
+  const openUpgrade = async () => {
+    const upgradeUrl = getUpgradeUrl();
+    if (!upgradeUrl) {
+      Alert.alert("需要升级 App", "请联系管理员获取最新安装包。");
+      return;
+    }
+
+    try {
+      await Linking.openURL(upgradeUrl);
+    } catch {
+      Alert.alert("打开升级地址失败", upgradeUrl);
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!secretKey.trim()) {
       Alert.alert("错误", "请输入密钥");
       return;
     }
 
+    setSubmitting(true);
     setStoreKey(secretKey);
-    const userType = validateKey(secretKey);
 
-    if (userType) {
-      switch (userType) {
-        case "mockLocation":
-          router.replace("/mockLocation");
-          break;
-        case "lookTV":
-          router.replace("/lookTV");
-          break;
-        case "moduleC":
-          router.replace("/moduleC");
-          break;
-        default:
-          Alert.alert("错误", "未知的用户类型");
+    try {
+      const result = await resolveModuleByKey(secretKey);
+
+      if (!result.valid) {
+        setError(result.message ?? "无效的密钥");
+        Alert.alert("错误", result.message ?? "无效的密钥，请重试");
+        return;
       }
-    } else {
-      Alert.alert("错误", "无效的密钥，请重试");
+
+      if (result.deliveryType !== "module" || !result.moduleName || !result.route) {
+        reset();
+        Alert.alert(
+          "暂不支持",
+          "当前卡密不是模块卡密，或模块尚未在 App 中注册。",
+        );
+        return;
+      }
+
+      if (result.compatibility?.upgradeRequired) {
+        applyResolvedModule({
+          secretKey: secretKey.trim(),
+          moduleName: result.moduleName,
+          deliveryType: result.deliveryType,
+          release: result.release ?? null,
+          compatibility: result.compatibility,
+        });
+
+        Alert.alert(
+          "需要升级 App",
+          result.message ??
+            `当前模块至少需要 App ${result.compatibility.minAppVersion} 才能使用。`,
+          [
+            {
+              text: "取消",
+              style: "cancel",
+              onPress: () => reset(),
+            },
+            {
+              text: "立即升级",
+              onPress: openUpgrade,
+            },
+          ],
+        );
+        return;
+      }
+
+      applyResolvedModule({
+        secretKey: secretKey.trim(),
+        moduleName: result.moduleName,
+        deliveryType: result.deliveryType,
+        release: result.release ?? null,
+        compatibility: result.compatibility ?? null,
+      });
+      router.replace("/loading");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "卡密解析失败，请稍后重试";
+      setError(message);
+      Alert.alert("错误", message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -58,47 +123,51 @@ export default function LoginScreen() {
         headerImage={
           <View style={styles.headerContent}>
             <ThemedText type="title" style={styles.headerTitle}>
-              🔑 密钥验证
+              密钥验证
             </ThemedText>
           </View>
         }
       >
         <ThemedView style={styles.content}>
           <ThemedText type="title" style={styles.title}>
-            请输入您的访问密钥
+            请输入模块卡密
           </ThemedText>
 
           <ThemedText style={styles.description}>
-            输入正确的密钥以进入对应的模块
+            系统会根据卡密和当前平台自动解析可访问模块，并检查是否需要升级 App。
           </ThemedText>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.label}>密钥：</ThemedText>
+            <ThemedText style={styles.label}>卡密：</ThemedText>
             <TextInput
               style={styles.input}
               value={secretKey}
               onChangeText={setSecretKey}
-              placeholder="请输入密钥"
+              placeholder="请输入卡密"
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
+              editable={!submitting}
             />
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <ThemedText style={styles.buttonText}>验证密钥</ThemedText>
+            <TouchableOpacity
+              style={[styles.button, submitting && styles.buttonDisabled]}
+              onPress={handleSubmit}
+              disabled={submitting}
+            >
+              <ThemedText style={styles.buttonText}>
+                {submitting ? "验证中..." : "验证密钥"}
+              </ThemedText>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.demoKeysContainer}>
-            <ThemedText style={styles.demoKeysTitle}>演示密钥：</ThemedText>
-            {MODULE_ACCESS_ITEMS.map((item) => (
-              <View key={item.userType} style={styles.demoKeyItem}>
-                <ThemedText style={styles.demoKeyLabel}>{item.label}:</ThemedText>
-                <ThemedText style={styles.demoKeyValue}>{item.key}</ThemedText>
-              </View>
-            ))}
+          <View style={styles.tipContainer}>
+            <ThemedText style={styles.tipTitle}>环境要求</ThemedText>
+            <ThemedText style={styles.tipText}>
+              需要在 `.env` 中配置 `EXPO_PUBLIC_API_BASE_URL`，指向你刚才改好的全栈服务。
+            </ThemedText>
           </View>
         </ThemedView>
       </ParallaxScrollView>
@@ -119,9 +188,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     textAlign: "center",
-  },
-  container: {
-    flex: 1,
   },
   content: {
     padding: 20,
@@ -161,38 +227,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
-  demoKeysContainer: {
+  tipContainer: {
     marginTop: 32,
     padding: 16,
-    backgroundColor: "rgba(102, 126, 234, 0.1)",
+    backgroundColor: "rgba(102, 126, 234, 0.08)",
     borderRadius: 8,
     gap: 8,
   },
-  demoKeysTitle: {
+  tipTitle: {
     fontSize: 16,
     fontWeight: "500",
-    marginBottom: 8,
   },
-  demoKeyItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 4,
-  },
-  demoKeyLabel: {
-    fontSize: 14,
-  },
-  demoKeyValue: {
-    fontSize: 14,
-    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+  tipText: {
+    opacity: 0.75,
+    lineHeight: 20,
   },
 });

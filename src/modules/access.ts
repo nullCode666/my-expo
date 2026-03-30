@@ -7,7 +7,7 @@ type AccessContext = {
   userType: UserType;
 };
 
-const ROUTE_BY_USER_TYPE: Record<Exclude<UserType, null>, string> = {
+const ROUTE_BY_MODULE_NAME: Record<Exclude<UserType, null>, string> = {
   mockLocation: "/mockLocation",
   lookTV: "/lookTV",
   moduleC: "/moduleC",
@@ -24,7 +24,7 @@ export function canAccessModuleRoute(
   if (isDev) return true;
   if (!isValidKey || !userType) return false;
 
-  return ROUTE_BY_USER_TYPE[userType] === route;
+  return ROUTE_BY_MODULE_NAME[userType] === route;
 }
 
 export function getAccessibleMenuModules(

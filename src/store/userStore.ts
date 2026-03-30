@@ -1,49 +1,116 @@
-import { getUserTypeByKey } from '@/src/config/moduleAccess';
-import { create } from 'zustand';
+import { create } from "zustand";
 
-// 定义用户类型
-export type UserType = 'mockLocation' | 'lookTV' | 'moduleC' | null;
+export type UserType = "mockLocation" | "lookTV" | "moduleC" | null;
+export type DeliveryType = "normal" | "module" | null;
 
-// 定义 store 类型
+export interface ResolvedModuleRelease {
+  id: number;
+  moduleName?: string | null;
+  platform: "android" | "ios" | "desktop";
+  version: string;
+  buildNumber: number;
+  packageUrl: string;
+  packageName?: string | null;
+  minAppVersion?: string | null;
+}
+
+export interface ModuleCompatibility {
+  supported: boolean;
+  upgradeRequired: boolean;
+  minAppVersion: string | null;
+}
+
 interface UserStore {
   userType: UserType;
   secretKey: string;
   isValidKey: boolean;
   error: string | null;
+  deliveryType: DeliveryType;
+  release: ResolvedModuleRelease | null;
+  compatibility: ModuleCompatibility | null;
+  downloadedBundleUri: string | null;
+  downloadStatus: "idle" | "downloading" | "ready" | "error";
   setSecretKey: (key: string) => void;
-  validateKey: (key?: string) => UserType;
+  applyResolvedModule: (payload: {
+    secretKey: string;
+    moduleName: UserType;
+    deliveryType: DeliveryType;
+    release: ResolvedModuleRelease | null;
+    compatibility: ModuleCompatibility | null;
+  }) => void;
+  setError: (error: string | null) => void;
+  setDownloadState: (payload: {
+    downloadedBundleUri?: string | null;
+    downloadStatus: "idle" | "downloading" | "ready" | "error";
+    error?: string | null;
+  }) => void;
   reset: () => void;
 }
 
-// 创建 store
-export const useUserStore = create<UserStore>((set, get) => ({
+export const useUserStore = create<UserStore>((set) => ({
   userType: null,
-  secretKey: '',
+  secretKey: "",
   isValidKey: false,
   error: null,
+  deliveryType: null,
+  release: null,
+  compatibility: null,
+  downloadedBundleUri: null,
+  downloadStatus: "idle",
 
-  // 设置密钥
   setSecretKey: (key) => {
     set({ secretKey: key, error: null });
   },
 
-  // 验证密钥
-  validateKey: (inputKey) => {
-    const rawSecretKey = inputKey ?? get().secretKey;
-    const secretKey = rawSecretKey.trim();
-    const userType = getUserTypeByKey(secretKey);
-    
-    if (userType) {
-      set({ secretKey, userType, isValidKey: true, error: null });
-      return userType;
-    } else {
-      set({ secretKey, userType: null, isValidKey: false, error: '无效的密钥' });
-      return null;
-    }
+  applyResolvedModule: ({
+    secretKey,
+    moduleName,
+    deliveryType,
+    release,
+    compatibility,
+  }) => {
+    set({
+      secretKey,
+      userType: moduleName,
+      deliveryType,
+      release,
+      compatibility,
+      downloadedBundleUri: null,
+      downloadStatus: "idle",
+      isValidKey: true,
+      error: null,
+    });
   },
 
-  // 重置状态
+  setError: (error) => {
+    set({
+      error,
+      isValidKey: false,
+    });
+  },
+
+  setDownloadState: ({ downloadedBundleUri, downloadStatus, error }) => {
+    set((state) => ({
+      downloadedBundleUri:
+        downloadedBundleUri === undefined
+          ? state.downloadedBundleUri
+          : downloadedBundleUri,
+      downloadStatus,
+      error: error === undefined ? state.error : error,
+    }));
+  },
+
   reset: () => {
-    set({ userType: null, secretKey: '', isValidKey: false, error: null });
+    set({
+      userType: null,
+      secretKey: "",
+      isValidKey: false,
+      error: null,
+      deliveryType: null,
+      release: null,
+      compatibility: null,
+      downloadedBundleUri: null,
+      downloadStatus: "idle",
+    });
   },
 }));

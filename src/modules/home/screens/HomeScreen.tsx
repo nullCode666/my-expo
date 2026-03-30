@@ -1,3 +1,4 @@
+import { ModuleReleaseCard } from "@/src/components/module-release-card";
 import ParallaxScrollView from "@/src/components/parallax-scroll-view";
 import { ThemedText } from "@/src/components/themed-text";
 import { ThemedView } from "@/src/components/themed-view";
@@ -20,7 +21,7 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { isValidKey, userType } = useUserStore();
+  const { downloadedBundleUri, isValidKey, release, userType } = useUserStore();
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(-width * 0.8));
@@ -98,6 +99,12 @@ export default function HomeScreen() {
           <ThemedText style={styles.description}>
             通过左侧菜单进入不同模块。长按标题可进入隐藏模块（开发环境或已验证密钥）。
           </ThemedText>
+
+          <ModuleReleaseCard
+            title="当前命中发布"
+            release={release}
+            downloadedBundleUri={downloadedBundleUri}
+          />
 
           <View style={styles.featureContainer}>
             {menuModules.slice(0, 3).map((m) => (

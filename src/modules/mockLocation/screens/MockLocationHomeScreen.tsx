@@ -1,3 +1,4 @@
+import { ModuleReleaseCard } from "@/src/components/module-release-card";
 import ParallaxScrollView from "@/src/components/parallax-scroll-view";
 import { ThemedText } from "@/src/components/themed-text";
 import { ThemedView } from "@/src/components/themed-view";
@@ -27,7 +28,8 @@ const AMAP_IOS_KEY = process.env.EXPO_PUBLIC_AMAP_IOS_KEY;
 
 export default function MockLocationHomeScreen() {
   const router = useRouter();
-  const { reset, isValidKey, userType } = useUserStore();
+  const { downloadedBundleUri, reset, isValidKey, release, userType } =
+    useUserStore();
 
   const [latitude, setLatitude] = useState("39.96");
   const [longitude, setLongitude] = useState("116.30");
@@ -239,6 +241,11 @@ export default function MockLocationHomeScreen() {
       }
     >
       <ThemedView style={styles.container}>
+        <ModuleReleaseCard
+          release={release}
+          downloadedBundleUri={downloadedBundleUri}
+        />
+
         {!amapKey && (
           <ThemedView style={styles.warning}>
             <ThemedText type="subtitle">AMap Key 未配置</ThemedText>

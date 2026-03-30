@@ -30,6 +30,9 @@ export default function RootLayout() {
         {/* 登录 */}
         <Stack.Screen name="login" />
 
+        {/* 模块加载 */}
+        <Stack.Screen name="loading" />
+
         {/* ==================== 业务模块 ==================== */}
         {/* 模块A - 位置模拟功能 */}
         <Stack.Screen name="mockLocation" />

@@ -1,3 +1,4 @@
+import { ModuleReleaseCard } from "@/src/components/module-release-card";
 import ParallaxScrollView from "@/src/components/parallax-scroll-view";
 import { ThemedText } from "@/src/components/themed-text";
 import { ThemedView } from "@/src/components/themed-view";
@@ -9,7 +10,8 @@ import { Button, StyleSheet, View } from "react-native";
 
 export default function ModuleCHomeScreen() {
   const router = useRouter();
-  const { reset, isValidKey, userType } = useUserStore();
+  const { downloadedBundleUri, reset, isValidKey, release, userType } =
+    useUserStore();
   const isDev = __DEV__;
   const canAccessCurrentModule = canAccessModuleRoute("/moduleC", {
     isDev,
@@ -44,6 +46,11 @@ export default function ModuleCHomeScreen() {
       }
     >
       <ThemedView style={styles.container}>
+        <ModuleReleaseCard
+          release={release}
+          downloadedBundleUri={downloadedBundleUri}
+        />
+
         <ThemedText type="title" style={styles.title}>
           欢迎使用模块C
         </ThemedText>
