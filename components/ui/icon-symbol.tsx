@@ -5,8 +5,7 @@ import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
-type IconSymbolName = keyof typeof MAPPING;
+type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
 
 /**
  * Add your SF Symbols to Material Icons mappings here.
@@ -29,7 +28,9 @@ const MAPPING = {
   'wand.and.stars': 'auto-fix-high',
   'lock.fill': 'lock',
   'square.fill': 'crop-square',
-} as IconMapping;
+} as const satisfies Record<string, MaterialIconName>;
+
+export type IconSymbolName = keyof typeof MAPPING;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
@@ -42,11 +43,23 @@ export function IconSymbol({
   color,
   style,
 }: {
-  name: IconSymbolName;
+  name: IconSymbolName | SymbolViewProps['name'];
   size?: number;
   color: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  const materialIconName =
+    typeof name === 'string' && name in MAPPING
+      ? MAPPING[name as IconSymbolName]
+      : 'help-outline';
+
+  return (
+    <MaterialIcons
+      color={color}
+      size={size}
+      name={materialIconName}
+      style={style}
+    />
+  );
 }

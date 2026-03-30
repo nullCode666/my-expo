@@ -25,7 +25,8 @@ export default function ParallaxScrollView({
 }: Props) {
   const theme = useTheme();
   const backgroundColor = theme.background?.val ?? '#fff';
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme();
+  const resolvedColorScheme = colorScheme === 'dark' ? 'dark' : 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollOffset(scrollRef);
   const headerAnimatedStyle = useAnimatedStyle(() => {
@@ -53,7 +54,7 @@ export default function ParallaxScrollView({
       <Animated.View
         style={[
           styles.header,
-          { backgroundColor: headerBackgroundColor[colorScheme] },
+          { backgroundColor: headerBackgroundColor[resolvedColorScheme] },
           headerAnimatedStyle,
         ]}>
         {headerImage}
