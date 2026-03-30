@@ -48,6 +48,10 @@ export default function RootLayout() {
 
         {/* WebView */}
         <Stack.Screen name="webview" />
+
+        {/* ==================== 隐藏模块 ==================== */}
+        <Stack.Screen name="hidden" />
+        <Stack.Screen name="custom" />
       </Stack>
       <StatusBar style="auto" />
     </TamaguiProvider>

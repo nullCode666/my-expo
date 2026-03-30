@@ -5,9 +5,10 @@ export type UserType = 'mockLocation' | 'lookTV' | 'moduleC' | null;
 
 // 定义密钥类型映射
 const KEY_TYPE_MAP: Record<string, UserType> = {
-  'test1': 'mockLocation',
-  'test2': 'lookTV',
-  'test3': 'moduleC',
+  // 示例：按密钥决定进入哪个模块
+  keyA123: 'mockLocation',
+  keyB456: 'lookTV',
+  keyC789: 'moduleC',
 };
 
 // 定义 store 类型

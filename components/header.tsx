@@ -18,7 +18,7 @@ export type HeaderProps = {
   /** 返回按钮点击回调 */
   onBackPress?: () => void;
   /** 自定义返回按钮图标 */
-  backIcon?: string;
+  backIcon?: Parameters<typeof IconSymbol>[0]["name"];
   /** 自定义背景色 */
   backgroundColor?: string;
   /** 是否透明背景 */

@@ -17,6 +17,7 @@ const MAPPING = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
+  'chevron.left': 'chevron-left',
   'chevron.right': 'chevron-right',
   'line.3.horizontal': 'menu',
   'xmark': 'close',
@@ -24,6 +25,10 @@ const MAPPING = {
   'briefcase.fill': 'work',
   'target': 'track-changes',
   'key.fill': 'vpn-key',
+  'play.rectangle.fill': 'play-circle-filled',
+  'wand.and.stars': 'auto-fix-high',
+  'lock.fill': 'lock',
+  'square.fill': 'crop-square',
 } as IconMapping;
 
 /**
