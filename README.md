@@ -8,9 +8,9 @@
 
 ## 技术栈
 
-- Expo 54
-- React 19
-- React Native 0.81
+- Expo 55
+- React 19.2
+- React Native 0.83
 - expo-router
 - Tamagui
 - Zustand
@@ -38,15 +38,19 @@
 ## 启动方式
 
 - 开发：`yarn start`
+- 清缓存启动：`yarn start:clear`
 - Android：`yarn android`
 - iOS：`yarn ios`
 - Web：`yarn web`
 
 ## 构建
 
-- Android 本地构建：`yarn build:android`
-- 预览包：`yarn build:preview`
-- 生产构建：`yarn build:production`
+- Android Debug：`yarn android:debug`
+- Android Release：`yarn android:release`
+- iOS Debug：`yarn ios:debug`
+- iOS Release：`yarn ios:release`
+- 双平台 Debug：`yarn build:debug`
+- 双平台 Release：`yarn build:release`
 
 ## 项目结构
 
@@ -67,6 +71,8 @@ android/ ios/         Expo prebuild 后的原生工程
 
 ## 常用命令
 
-- 重新生成原生工程：`npx expo prebuild --clean`
-- 类型检查：`npx tsc --noEmit`
+- 生成原生工程：`yarn prebuild`
+- 重新生成原生工程：`yarn prebuild:clean`
+- 类型检查：`yarn typecheck`
 - 代码检查：`yarn lint`
+- 一键检查：`yarn check`
