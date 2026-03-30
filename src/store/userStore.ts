@@ -1,15 +1,8 @@
+import { getUserTypeByKey } from '@/src/config/moduleAccess';
 import { create } from 'zustand';
 
 // 定义用户类型
 export type UserType = 'mockLocation' | 'lookTV' | 'moduleC' | null;
-
-// 定义密钥类型映射
-const KEY_TYPE_MAP: Record<string, UserType> = {
-  // 示例：按密钥决定进入哪个模块
-  keyA123: 'mockLocation',
-  keyB456: 'lookTV',
-  keyC789: 'moduleC',
-};
 
 // 定义 store 类型
 interface UserStore {
@@ -18,7 +11,7 @@ interface UserStore {
   isValidKey: boolean;
   error: string | null;
   setSecretKey: (key: string) => void;
-  validateKey: () => boolean;
+  validateKey: (key?: string) => UserType;
   reset: () => void;
 }
 
@@ -35,16 +28,17 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
 
   // 验证密钥
-  validateKey: () => {
-    const { secretKey } = get();
-    const userType = KEY_TYPE_MAP[secretKey];
+  validateKey: (inputKey) => {
+    const rawSecretKey = inputKey ?? get().secretKey;
+    const secretKey = rawSecretKey.trim();
+    const userType = getUserTypeByKey(secretKey);
     
     if (userType) {
-      set({ userType, isValidKey: true, error: null });
-      return true;
+      set({ secretKey, userType, isValidKey: true, error: null });
+      return userType;
     } else {
-      set({ userType: null, isValidKey: false, error: '无效的密钥' });
-      return false;
+      set({ secretKey, userType: null, isValidKey: false, error: '无效的密钥' });
+      return null;
     }
   },
 

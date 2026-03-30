@@ -6,7 +6,7 @@ import { WebView } from "react-native-webview";
 interface AnalysisButtonProps {
   currentUrl: string;
   currentTitle?: string;
-  webViewRef?: React.RefObject<WebView<{}> | null>;
+  webViewRef?: React.RefObject<WebView | null>;
 }
 
 // 解析源列表

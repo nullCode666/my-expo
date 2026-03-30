@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import { Header } from "@/components/header";
 import { Stack } from "expo-router";
 
 export default function ModuleBLayout() {

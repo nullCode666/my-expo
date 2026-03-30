@@ -1,5 +1,7 @@
+import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
+import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Card,
   H3,
@@ -22,11 +24,23 @@ interface TvItem {
 
 export default function VideoHomeScreen() {
   const router = useRouter();
+  const { isValidKey, userType } = useUserStore();
+  const isDev = __DEV__;
 
-  const [tvList, setTvList] = useState<TvItem[]>([]);
+  const canAccessCurrentModule = canAccessModuleRoute("/lookTV", {
+    isDev,
+    isValidKey,
+    userType,
+  });
 
   useEffect(() => {
-    const list: TvItem[] = [
+    if (canAccessCurrentModule) return;
+
+    router.replace(hasAppAccess(isDev, isValidKey) ? "/" : "/login");
+  }, [canAccessCurrentModule, isDev, isValidKey, router]);
+
+  const tvList = useMemo<TvItem[]>(
+    () => [
       {
         name: "腾讯视频",
         url: "https://v.qq.com/",
@@ -67,9 +81,13 @@ export default function VideoHomeScreen() {
         remark: "湖南卫视官方平台",
         injectedJavaScript: "",
       },
-    ];
-    setTvList(list);
-  }, []);
+    ],
+    [],
+  );
+
+  if (!canAccessCurrentModule) {
+    return null;
+  }
 
   const handleItemPress = (item: TvItem) => {
     router.push({
@@ -120,4 +138,3 @@ export default function VideoHomeScreen() {
     </ScrollView>
   );
 }
-

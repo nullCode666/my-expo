@@ -2,6 +2,7 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { getAccessibleMenuModules, hasAppAccess } from "@/src/modules/access";
 import { getModulesByVisibility } from "@/src/modules/registry";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
@@ -19,20 +20,29 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { isValidKey } = useUserStore();
+  const { isValidKey, userType } = useUserStore();
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(-width * 0.8));
 
   const isDev = __DEV__;
+  const allowAppAccess = hasAppAccess(isDev, isValidKey);
 
   useEffect(() => {
-    if (!isDev && !isValidKey) {
+    if (!allowAppAccess) {
       router.replace("/login");
     }
-  }, [isDev, isValidKey, router]);
+  }, [allowAppAccess, router]);
 
-  const menuModules = useMemo(() => getModulesByVisibility("menu"), []);
+  const menuModules = useMemo(
+    () =>
+      getAccessibleMenuModules(getModulesByVisibility("menu"), {
+        isDev,
+        isValidKey,
+        userType,
+      }),
+    [isDev, isValidKey, userType],
+  );
 
   const toggleMenu = () => {
     const toValue = menuVisible ? -width * 0.8 : 0;
@@ -51,9 +61,9 @@ export default function HomeScreen() {
     }, 300);
   };
 
-  const allowHidden = isDev || isValidKey;
+  const allowHidden = allowAppAccess;
 
-  if (!isDev && !isValidKey) {
+  if (!allowAppAccess) {
     return null;
   }
 
@@ -309,4 +319,3 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 });
-

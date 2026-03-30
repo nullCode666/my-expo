@@ -1,11 +1,14 @@
 import { Header } from "@/components/header";
+import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
+import { useUserStore } from "@/src/store/userStore";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { LatLng, MapView, Marker } from "react-native-amap3d";
 
 export default function MapPickerPage() {
   const router = useRouter();
+  const { isValidKey, userType } = useUserStore();
   const params = useLocalSearchParams();
 
   const initialLatitude: any = params.initialLatitude || 39.91095;
@@ -16,6 +19,18 @@ export default function MapPickerPage() {
     latitude: parseFloat(initialLatitude),
     longitude: parseFloat(initialLongitude),
   });
+  const isDev = __DEV__;
+  const canAccessCurrentModule = canAccessModuleRoute("/mockLocation", {
+    isDev,
+    isValidKey,
+    userType,
+  });
+
+  useEffect(() => {
+    if (canAccessCurrentModule) return;
+
+    router.replace(hasAppAccess(isDev, isValidKey) ? "/" : "/login");
+  }, [canAccessCurrentModule, isDev, isValidKey, router]);
 
   // 处理地图点击
   const handleMapPress = useCallback((event: { nativeEvent: LatLng }) => {
@@ -44,6 +59,10 @@ export default function MapPickerPage() {
       </View>
     </TouchableOpacity>
   );
+
+  if (!canAccessCurrentModule) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

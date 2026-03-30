@@ -1,6 +1,6 @@
 import { useRouter, useNavigation } from 'expo-router';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Platform, StatusBar } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from './themed-text';
 import { IconSymbol } from './ui/icon-symbol';

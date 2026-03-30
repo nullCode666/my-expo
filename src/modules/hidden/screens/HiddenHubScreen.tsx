@@ -1,6 +1,7 @@
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { getAccessibleHiddenModules, hasAppAccess } from "@/src/modules/access";
 import { getModulesByVisibility } from "@/src/modules/registry";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
@@ -11,12 +12,12 @@ export default function HiddenHubScreen() {
   const { isValidKey } = useUserStore();
   const isDev = __DEV__;
 
-  const allowHidden = isDev || isValidKey;
-  const hiddenModules = getModulesByVisibility("hidden").filter((m) => {
-    if (!allowHidden) return false;
-    if (m.devOnly && !allowHidden) return false;
-    return true;
-  });
+  const allowHidden = hasAppAccess(isDev, isValidKey);
+  const hiddenModules = getAccessibleHiddenModules(
+    getModulesByVisibility("hidden"),
+    isDev,
+    isValidKey,
+  ).filter((m) => m.route !== "/hidden");
 
   if (!allowHidden) {
     return (
@@ -44,16 +45,25 @@ export default function HiddenHubScreen() {
       }
     >
       <ThemedView style={styles.container}>
-        {hiddenModules.map((m) => (
-          <TouchableOpacity
-            key={m.id}
-            style={styles.card}
-            onPress={() => router.push(m.route as any)}
-          >
-            <ThemedText type="subtitle">{m.title}</ThemedText>
-            <ThemedText style={styles.desc}>{m.subtitle ?? ""}</ThemedText>
-          </TouchableOpacity>
-        ))}
+        {hiddenModules.length === 0 ? (
+          <ThemedView style={styles.emptyState}>
+            <ThemedText type="subtitle">当前没有可用隐藏模块</ThemedText>
+            <ThemedText style={styles.desc}>
+              仅开发环境展示 `devOnly` 模块。
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          hiddenModules.map((m) => (
+            <TouchableOpacity
+              key={m.id}
+              style={styles.card}
+              onPress={() => router.push(m.route as any)}
+            >
+              <ThemedText type="subtitle">{m.title}</ThemedText>
+              <ThemedText style={styles.desc}>{m.subtitle ?? ""}</ThemedText>
+            </TouchableOpacity>
+          ))
+        )}
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -79,6 +89,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(17, 24, 39, 0.06)",
     gap: 6,
   },
+  emptyState: {
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: "rgba(17, 24, 39, 0.04)",
+    gap: 6,
+  },
   desc: {
     opacity: 0.7,
   },
@@ -100,4 +116,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

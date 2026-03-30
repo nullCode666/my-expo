@@ -1,6 +1,7 @@
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
 import { useUserStore } from "@/src/store/userStore";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -26,7 +27,7 @@ const AMAP_IOS_KEY = process.env.EXPO_PUBLIC_AMAP_IOS_KEY;
 
 export default function MockLocationHomeScreen() {
   const router = useRouter();
-  const { reset } = useUserStore();
+  const { reset, isValidKey, userType } = useUserStore();
 
   const [latitude, setLatitude] = useState("39.96");
   const [longitude, setLongitude] = useState("116.30");
@@ -50,6 +51,19 @@ export default function MockLocationHomeScreen() {
     if (!amapKey) return;
     AMapSdk.init(amapKey as any);
   }, [amapKey]);
+
+  const isDev = __DEV__;
+  const canAccessCurrentModule = canAccessModuleRoute("/mockLocation", {
+    isDev,
+    isValidKey,
+    userType,
+  });
+
+  useEffect(() => {
+    if (canAccessCurrentModule) return;
+
+    router.replace(hasAppAccess(isDev, isValidKey) ? "/" : "/login");
+  }, [canAccessCurrentModule, isDev, isValidKey, router]);
 
   const requestLocationPermissions = async () => {
     if (Platform.OS !== "android") {
@@ -157,7 +171,7 @@ export default function MockLocationHomeScreen() {
       stopMockLocation();
       setIsMocking(false);
       Alert.alert("成功", "模拟位置已停止");
-    } catch (_error) {
+    } catch {
       const errorMessage = getError();
       Alert.alert(
         "停止失败",
@@ -171,12 +185,12 @@ export default function MockLocationHomeScreen() {
 
     try {
       await Linking.sendIntent("android.settings.APPLICATION_DEVELOPMENT_SETTINGS");
-    } catch (_error) {
+    } catch {
       try {
         await Linking.sendIntent("android.settings.APPLICATION_DETAILS_SETTINGS", [
           { key: "package", value: "com.startwinter.myexpo" },
         ]);
-      } catch (_fallbackError) {
+      } catch {
         await Linking.openSettings();
       }
     }
@@ -208,6 +222,10 @@ export default function MockLocationHomeScreen() {
       );
     }
   }, [params.selectedLatitude, params.selectedLongitude]);
+
+  if (!canAccessCurrentModule) {
+    return null;
+  }
 
   return (
     <ParallaxScrollView
@@ -466,4 +484,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-

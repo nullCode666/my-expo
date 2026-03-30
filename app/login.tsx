@@ -1,6 +1,7 @@
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { MODULE_ACCESS_ITEMS } from "@/src/config/moduleAccess";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -17,7 +18,7 @@ import {
 export default function LoginScreen() {
   const [secretKey, setSecretKey] = useState("");
   const router = useRouter();
-  const { setSecretKey: setStoreKey, validateKey, userType } = useUserStore();
+  const { setSecretKey: setStoreKey, validateKey } = useUserStore();
 
   const handleSubmit = () => {
     if (!secretKey.trim()) {
@@ -26,9 +27,9 @@ export default function LoginScreen() {
     }
 
     setStoreKey(secretKey);
-    const isValid = validateKey();
+    const userType = validateKey(secretKey);
 
-    if (isValid && userType) {
+    if (userType) {
       switch (userType) {
         case "mockLocation":
           router.replace("/mockLocation");
@@ -92,18 +93,12 @@ export default function LoginScreen() {
 
           <View style={styles.demoKeysContainer}>
             <ThemedText style={styles.demoKeysTitle}>演示密钥：</ThemedText>
-            <View style={styles.demoKeyItem}>
-              <ThemedText style={styles.demoKeyLabel}>模块A:</ThemedText>
-              <ThemedText style={styles.demoKeyValue}>keyA123</ThemedText>
-            </View>
-            <View style={styles.demoKeyItem}>
-              <ThemedText style={styles.demoKeyLabel}>模块B:</ThemedText>
-              <ThemedText style={styles.demoKeyValue}>keyB456</ThemedText>
-            </View>
-            <View style={styles.demoKeyItem}>
-              <ThemedText style={styles.demoKeyLabel}>模块C:</ThemedText>
-              <ThemedText style={styles.demoKeyValue}>keyC789</ThemedText>
-            </View>
+            {MODULE_ACCESS_ITEMS.map((item) => (
+              <View key={item.userType} style={styles.demoKeyItem}>
+                <ThemedText style={styles.demoKeyLabel}>{item.label}:</ThemedText>
+                <ThemedText style={styles.demoKeyValue}>{item.key}</ThemedText>
+              </View>
+            ))}
           </View>
         </ThemedView>
       </ParallaxScrollView>

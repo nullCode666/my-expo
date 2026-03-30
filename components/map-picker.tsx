@@ -7,7 +7,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { AMapSdk, MapView, Marker, LatLng } from 'react-native-amap3d';
+import { MapView, Marker, LatLng } from 'react-native-amap3d';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { IconSymbol } from './ui/icon-symbol';
@@ -48,13 +48,10 @@ export default function MapPicker() {
     longitude: parseFloat(initialLongitude),
   });
 
-  const [isConfirmed, setIsConfirmed] = useState(false);
-
   // 处理地图点击
   const handleMapPress = useCallback((event: { nativeEvent: LatLng }) => {
     const { latitude, longitude } = event.nativeEvent;
     setSelectedLocation({ latitude, longitude });
-    setIsConfirmed(false);
   }, []);
 
   // 确认选择

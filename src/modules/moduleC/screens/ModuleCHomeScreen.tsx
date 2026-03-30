@@ -1,19 +1,36 @@
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, StyleSheet, View } from "react-native";
 
 export default function ModuleCHomeScreen() {
   const router = useRouter();
-  const { reset } = useUserStore();
+  const { reset, isValidKey, userType } = useUserStore();
+  const isDev = __DEV__;
+  const canAccessCurrentModule = canAccessModuleRoute("/moduleC", {
+    isDev,
+    isValidKey,
+    userType,
+  });
+
+  useEffect(() => {
+    if (canAccessCurrentModule) return;
+
+    router.replace(hasAppAccess(isDev, isValidKey) ? "/" : "/login");
+  }, [canAccessCurrentModule, isDev, isValidKey, router]);
 
   const handleLogout = () => {
     reset();
     router.replace("/");
   };
+
+  if (!canAccessCurrentModule) {
+    return null;
+  }
 
   return (
     <ParallaxScrollView
@@ -95,4 +112,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-

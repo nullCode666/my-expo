@@ -1,11 +1,15 @@
 import AnalysisButton from "@/components/analysis-button";
-import Header from "@/components/header";
-import { useLocalSearchParams } from "expo-router";
-import { useRef, useState } from "react";
+import { Header } from "@/components/header";
+import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
+import { useUserStore } from "@/src/store/userStore";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { WebView, WebViewNavigation } from "react-native-webview";
 
 export default function WebViewScreen() {
+  const router = useRouter();
+  const { isValidKey, userType } = useUserStore();
   const { url, name, injectedJavaScript } = useLocalSearchParams<{
     url: string;
     name?: string;
@@ -14,6 +18,20 @@ export default function WebViewScreen() {
   const [loading, setLoading] = useState(true);
   const [currentUrl, setCurrentUrl] = useState("");
   const webViewRef = useRef<WebView>(null);
+  const decodedUrl = url ? decodeURIComponent(url) : "";
+  const initialUrl = currentUrl || decodedUrl;
+  const isDev = __DEV__;
+  const canAccessCurrentModule = canAccessModuleRoute("/lookTV", {
+    isDev,
+    isValidKey,
+    userType,
+  });
+
+  useEffect(() => {
+    if (canAccessCurrentModule) return;
+
+    router.replace(hasAppAccess(isDev, isValidKey) ? "/" : "/login");
+  }, [canAccessCurrentModule, isDev, isValidKey, router]);
 
   if (!url) {
     return (
@@ -23,10 +41,9 @@ export default function WebViewScreen() {
     );
   }
 
-  const decodedUrl = decodeURIComponent(url);
-  const initialUrl = currentUrl || decodedUrl;
-
-  console.log(initialUrl);
+  if (!canAccessCurrentModule) {
+    return null;
+  }
 
   // 处理导航状态变化，获取当前 URL
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
@@ -55,7 +72,7 @@ export default function WebViewScreen() {
         ref={webViewRef}
         source={{ uri: decodedUrl }}
         style={styles.webview}
-        onLoadStart={() => setLoading(false)}
+        onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
         onNavigationStateChange={handleNavigationStateChange}
         javaScriptEnabled={true}
