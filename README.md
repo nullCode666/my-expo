@@ -56,10 +56,11 @@
 
 ```text
 app/                  Expo Router 路由入口
+src/components/       通用组件
+src/hooks/            通用 hooks
 src/modules/          业务模块页面
 src/config/           项目配置
 src/store/            Zustand 状态
-components/           通用组件
 android/ ios/         Expo prebuild 后的原生工程
 ```
 

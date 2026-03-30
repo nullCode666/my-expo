@@ -1,5 +1,5 @@
-import AnalysisButton from "@/components/analysis-button";
-import { Header } from "@/components/header";
+import AnalysisButton from "@/src/components/analysis-button";
+import { Header } from "@/src/components/header";
 import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
 import { useUserStore } from "@/src/store/userStore";
 import { useLocalSearchParams, useRouter } from "expo-router";

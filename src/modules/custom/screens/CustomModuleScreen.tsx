@@ -1,6 +1,6 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import ParallaxScrollView from "@/src/components/parallax-scroll-view";
+import { ThemedText } from "@/src/components/themed-text";
+import { ThemedView } from "@/src/components/themed-view";
 import { useRouter } from "expo-router";
 import { Button, StyleSheet, View } from "react-native";
 
@@ -65,4 +65,3 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 });
-

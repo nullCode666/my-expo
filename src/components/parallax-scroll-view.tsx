@@ -8,8 +8,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from 'tamagui';
 
-import { ThemedView } from '@/components/themed-view';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemedView } from '@/src/components/themed-view';
+import { useColorScheme } from '@/src/hooks/use-color-scheme';
 
 const HEADER_HEIGHT = 250;
 

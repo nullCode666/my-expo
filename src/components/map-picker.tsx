@@ -11,7 +11,7 @@ import { MapView, Marker, LatLng } from 'react-native-amap3d';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { IconSymbol } from './ui/icon-symbol';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useColorScheme } from '@/src/hooks/use-color-scheme';
 
 const { width, height } = Dimensions.get('window');
 

@@ -1,6 +1,6 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import ParallaxScrollView from "@/src/components/parallax-scroll-view";
+import { ThemedText } from "@/src/components/themed-text";
+import { ThemedView } from "@/src/components/themed-view";
 import { MODULE_ACCESS_ITEMS } from "@/src/config/moduleAccess";
 import { useUserStore } from "@/src/store/userStore";
 import { useRouter } from "expo-router";

@@ -1,4 +1,4 @@
-import { Header } from "@/components/header";
+import { Header } from "@/src/components/header";
 import { canAccessModuleRoute, hasAppAccess } from "@/src/modules/access";
 import { useUserStore } from "@/src/store/userStore";
 import { useLocalSearchParams, useRouter } from "expo-router";

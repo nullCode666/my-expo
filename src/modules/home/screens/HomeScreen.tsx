@@ -1,7 +1,7 @@
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import ParallaxScrollView from "@/src/components/parallax-scroll-view";
+import { ThemedText } from "@/src/components/themed-text";
+import { ThemedView } from "@/src/components/themed-view";
+import { IconSymbol } from "@/src/components/ui/icon-symbol";
 import { getAccessibleMenuModules, hasAppAccess } from "@/src/modules/access";
 import { getModulesByVisibility } from "@/src/modules/registry";
 import { useUserStore } from "@/src/store/userStore";
